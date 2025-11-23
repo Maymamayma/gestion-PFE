@@ -1,23 +1,15 @@
 // src/routes/report.routes.js
 const express = require("express");
 const router = express.Router();
+const upload = require("../middleware/uploadReport");
 
-const {
-  uploadRapport,
-  getRapportById,
-  updateRapportNotes,
-} = require("../controllers/report.controller");
-
-const { authenticate, authorize } = require("../middleware/auth");
-const { uploadSingleReport } = require("../middleware/multer");
+const { uploadReportVersion } = require("../controllers/report.controller");
 
 // UPLOAD new Version
-router.post("/reports/upload", uploadRapport);
-
-// GET metadata of one report version
-router.get("/reports/:reportId", getRapportById);
-
-// UPDATE notes of one version
-router.patch("/reports/:reportId", updateRapportNotes);
+router.post(
+  "/projects/:projectId/reports/upload",
+  upload.single("pdf"),
+  uploadReportVersion
+);
 
 module.exports = router;
