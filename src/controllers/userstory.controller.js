@@ -1,120 +1,74 @@
-const UserStory = require("../models/UserStory");
+const UserStoryService = require("../services/userStory.service");
 
-exports.createUserStory = async (req, res) => {
-  try {
-    const { projectId, sprintId } = req.params;
-    const { titre, description, priorite, acceptance } = req.body;
+module.exports = {
+  createUserStory: async (req, res) => {
+    try {
+      const { projectId, sprintId } = req.params;
 
-    const sprint = await Sprint.findOne({ _id: sprintId, projet: projectId });
-    if (!sprint) {
-      return res.status(404).json({ message: "Sprint non trouvé" });
+      const newStory = await UserStoryService.create({
+        ...req.body,
+        projectId,
+        sprintId,
+      });
+
+      res.status(201).json(newStory);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
     }
+  },
 
-    const userStory = new UserStory({
-      titre,
-      description,
-      priorite,
-      acceptance,
-      sprint: sprintId,
-      projet: projectId,
-    });
+  listUserStories: async (req, res) => {
+    try {
+      const { projectId, sprintId } = req.params;
 
-    await userStory.save();
-
-    res.status(201).json({
-      message: "User Story créée avec succès",
-      userStory,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-exports.getUserStories = async (req, res) => {
-  try {
-    const userStories = await userStory.find({});
-    res.status(200).json(userStories);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-exports.getUserStoryById = async (req, res) => {
-  try {
-    const { projectId, sprintId, userStoryId } = req.params;
-
-    const userStory = await UserStory.findOne({
-      _id: userStoryId,
-      sprint: sprintId,
-      projet: projectId,
-    }).populate("sprint");
-
-    if (!userStory) {
-      return res.status(404).json({ message: "User Story non trouvée" });
+      const stories = await UserStoryService.list(projectId, sprintId);
+      res.json(stories);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
     }
+  },
 
-    res.json({
-      message: "User Story récupérée avec succès",
-      userStory,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+  getUserStory: async (req, res) => {
+    try {
+      const { userStoryId } = req.params;
+      const story = await UserStoryService.getById(userStoryId);
 
-exports.updateUserStory = async (req, res) => {
-  try {
-    const { projectId, sprintId, userStoryId } = req.params;
-    const { titre, description, priorite, acceptance } = req.body;
+      if (!story)
+        return res.status(404).json({ error: "User story not found" });
 
-    const userStory = await UserStory.findOneAndUpdate(
-      {
-        _id: userStoryId,
-        sprint: sprintId,
-        projet: projectId,
-      },
-      {
-        titre,
-        description,
-        priorite,
-        acceptance,
-        dateModification: Date.now(),
-      },
-      { new: true }
-    );
-
-    if (!userStory) {
-      return res.status(404).json({ message: "User Story non trouvée" });
+      res.json(story);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
     }
+  },
 
-    res.json({
-      message: "User Story modifiée avec succès",
-      userStory,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+  updateUserStory: async (req, res) => {
+    try {
+      const { userStoryId } = req.params;
 
-exports.deleteUserStory = async (req, res) => {
-  try {
-    const { projectId, sprintId, userStoryId } = req.params;
+      const updated = await UserStoryService.update(userStoryId, req.body);
 
-    const userStory = await UserStory.findOneAndDelete({
-      _id: userStoryId,
-      sprint: sprintId,
-      projet: projectId,
-    });
+      if (!updated)
+        return res.status(404).json({ error: "User story not found" });
 
-    if (!userStory) {
-      return res.status(404).json({ message: "User Story non trouvée" });
+      res.json(updated);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
     }
+  },
 
-    res.json({
-      message: "User Story supprimée avec succès",
-      userStory,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+  deleteUserStory: async (req, res) => {
+    try {
+      const { userStoryId } = req.params;
+
+      const deleted = await UserStoryService.delete(userStoryId);
+
+      if (!deleted)
+        return res.status(404).json({ error: "User story not found" });
+
+      res.json({ message: "User story deleted" });
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  },
 };

@@ -1,22 +1,39 @@
-// src/routes/userstory.routes.js
 const express = require("express");
 const router = express.Router();
 const {
   createUserStory,
-  getUserStoryById,
   updateUserStory,
   deleteUserStory,
-  getUserStories,
+  getUserStory,
+  listUserStories,
 } = require("../controllers/userstory.controller");
 
 // CREATE User Story
-router.post("/", createUserStory);
+router.post(
+  "/projects/:projectId/sprints/:sprintId/userStories",
+  createUserStory
+);
 // VIEW all user stories
-router.post("/", getUserStories);
-router
-  .route("/:userStoryId")
-  .get(getUserStoryById)
-  .put(updateUserStory)
-  .delete(deleteUserStory);
+router.post(
+  "/projects/:projectId/sprints/:sprintId/userStories",
+  listUserStories
+);
+
+// VIEW user story by id
+router.get(
+  "/projects/:projectId/sprints/:sprintId/userStories/:userStoryId",
+  getUserStory
+);
+
+// UPDATE user story by id
+router.put(
+  "/projects/:projectId/sprints/:sprintId/userStories/:userStoryId",
+  updateUserStory
+);
+// DELETE user story by id
+router.delete(
+  "/projects/:projectId/sprints/:sprintId/userStories/:userStoryId",
+  deleteUserStory
+);
 
 module.exports = router;
