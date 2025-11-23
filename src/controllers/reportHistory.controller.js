@@ -75,3 +75,19 @@ exports.deleteReport = async (req, res) => {
       .json({ message: "Failed to delete report", error: error.message });
   }
 };
+
+exports.getReportHistory = async (req, res, next) => {
+  try {
+    const reports = await Report.find({ project: req.params.projectId }).sort(
+      "-createdAt"
+    );
+
+    res.status(200).json({
+      success: true,
+      count: reports.length,
+      data: reports,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+};
