@@ -3,13 +3,20 @@ const express = require("express");
 const router = express.Router();
 
 const {
-  prioritizeUserStory,
-  getPrioritizedUserStories,
+  updatePriority,
+  listSorted,
 } = require("../controllers/userstoryPriority.controller");
 
-// VIEW user stories by priority
-router.route("/prioritized").get(getPrioritizedUserStories);
+// Change priority
+router.patch(
+  "/projects/:projectId/sprints/:sprintId/userStories/:userStoryId/priority",
+  updatePriority
+);
 
-// UPDATE priority
-router.route("/:userStoryId/prioritize").patch(prioritizeUserStory);
+// Get stories sorted by priority
+router.get(
+  "/projects/:projectId/sprints/:sprintId/userStories/sorted/by-priority",
+  listSorted
+);
+
 module.exports = router;

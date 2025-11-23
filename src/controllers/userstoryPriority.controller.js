@@ -1,51 +1,35 @@
-const UserStory = require("../models/UserStory");
+const PriorityService = require("../services/userStoryPriority.service");
 
-exports.prioritizeUserStory = async (req, res, next) => {
-  try {
-    const { userStoryId } = req.params;
-    const { priority } = req.body; // priority est le nouveau rang (e.g., 1, 2, 3...)
+module.exports = {
+  updatePriority: async (req, res) => {
+    try {
+      const { userStoryId } = req.params;
+      const { priority } = req.body;
 
-    if (typeof priority !== "number" || priority < 0) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "La priorité doit être un nombre positif.",
-        });
+      if (!["High", "Medium", "Low"].includes(priority)) {
+        return res.status(400).json({ error: "Invalid priority value" });
+      }
+
+      const updated = await PriorityService.setPriority(userStoryId, priority);
+
+      if (!updated)
+        return res.status(404).json({ error: "User story not found" });
+
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
+  },
 
-    let userStory = await UserStory.findById(userStoryId);
+  listSorted: async (req, res) => {
+    try {
+      const { projectId, sprintId } = req.params;
 
-    if (!userStory) {
-      return res
-        .status(404)
-        .json({ success: false, error: "User Story non trouvée" });
+      const stories = await PriorityService.listByPriority(projectId, sprintId);
+
+      res.json(stories);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
-
-    userStory.priority = priority;
-    await userStory.save();
-
-    res.status(200).json({
-      success: true,
-      data: userStory,
-    });
-  } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
-  }
-};
-
-exports.getPrioritizedUserStories = async (req, res, next) => {
-  try {
-    const userStories = await UserStory.find({
-      sprint: req.params.sprintId,
-    }).sort("priority");
-
-    res.status(200).json({
-      success: true,
-      count: userStories.length,
-      data: userStories,
-    });
-  } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
-  }
+  },
 };
