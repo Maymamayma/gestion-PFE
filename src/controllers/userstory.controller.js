@@ -1,16 +1,10 @@
-// src/controllers/userstory.controller.js
 const UserStory = require("../models/UserStory");
-const Sprint = require("../models/Sprint");
 
-/**
- * CREATE User Story
- */
 exports.createUserStory = async (req, res) => {
   try {
     const { projectId, sprintId } = req.params;
     const { titre, description, priorite, acceptance } = req.body;
 
-    // Vérifier que le sprint appartient bien au projet
     const sprint = await Sprint.findOne({ _id: sprintId, projet: projectId });
     if (!sprint) {
       return res.status(404).json({ message: "Sprint non trouvé" });
@@ -36,30 +30,15 @@ exports.createUserStory = async (req, res) => {
   }
 };
 
-/**
- * GET all User Stories of a Sprint
- */
-exports.getUserStoriesBySprintId = async (req, res) => {
+exports.getUserStories = async (req, res) => {
   try {
-    const { projectId, sprintId } = req.params;
-
-    const userStories = await UserStory.find({
-      sprint: sprintId,
-      projet: projectId,
-    }).populate("sprint");
-
-    res.json({
-      message: "User Stories récupérées avec succès",
-      userStories,
-    });
+    const userStories = await userStory.find({});
+    res.status(200).json(userStories);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-/**
- * GET One User Story
- */
 exports.getUserStoryById = async (req, res) => {
   try {
     const { projectId, sprintId, userStoryId } = req.params;
@@ -83,9 +62,6 @@ exports.getUserStoryById = async (req, res) => {
   }
 };
 
-/**
- * UPDATE User Story
- */
 exports.updateUserStory = async (req, res) => {
   try {
     const { projectId, sprintId, userStoryId } = req.params;
@@ -120,9 +96,6 @@ exports.updateUserStory = async (req, res) => {
   }
 };
 
-/**
- * DELETE User Story
- */
 exports.deleteUserStory = async (req, res) => {
   try {
     const { projectId, sprintId, userStoryId } = req.params;
