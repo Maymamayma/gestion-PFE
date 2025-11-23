@@ -12,27 +12,12 @@ const { authenticate, authorize } = require("../middleware/auth");
 const { uploadSingleReport } = require("../middleware/multer");
 
 // UPLOAD new Version
-router.post(
-  "/projects/:projectId/reports",
-  authenticate,
-  authorize("ETUDIANT"),
-  uploadSingleReport,
-  uploadRapport
-);
+router.post("/reports/upload", uploadRapport);
 
 // GET metadata of one report version
-router.get(
-  "/projects/:projectId/reports/:reportId",
-  authenticate,
-  getRapportById
-);
+router.get("/reports/:reportId", getRapportById);
 
 // UPDATE notes of one version
-router.patch(
-  "/projects/:projectId/reports/:reportId",
-  authenticate,
-  authorize("ETUDIANT"),
-  updateRapportNotes
-);
+router.patch("/reports/:reportId", updateRapportNotes);
 
 module.exports = router;

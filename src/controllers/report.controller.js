@@ -2,34 +2,26 @@
 const VersionRapport = require("../models/VersionRapport");
 const Project = require("../models/Project");
 
-/**
- * UPLOAD NEW REPORT VERSION
- * POST /projects/:projectId/reports
- */
 exports.uploadRapport = async (req, res) => {
   try {
     const { projectId } = req.params;
     const { notes } = req.body;
 
-    // Vérifier la présence du fichier
     if (!req.file) {
       return res.status(400).json({ message: "Aucun fichier fourni" });
     }
 
-    // Vérifier que le projet existe
     const project = await Project.findById(projectId);
     if (!project) {
       return res.status(404).json({ message: "Projet non trouvé" });
     }
 
-    // Récupérer la dernière version existante
     const lastVersion = await VersionRapport.findOne({
       projet: projectId,
     }).sort({ version: -1 });
 
     const nextVersion = lastVersion ? lastVersion.version + 1 : 1;
 
-    // Créer la nouvelle version
     const versionRapport = new VersionRapport({
       version: nextVersion,
       urlFichier: req.file.path,
@@ -50,10 +42,6 @@ exports.uploadRapport = async (req, res) => {
   }
 };
 
-/**
- * GET ONE VERSION METADATA
- * GET /projects/:projectId/reports/:reportId
- */
 exports.getRapportById = async (req, res) => {
   try {
     const { projectId, reportId } = req.params;
@@ -76,10 +64,6 @@ exports.getRapportById = async (req, res) => {
   }
 };
 
-/**
- * UPDATE NOTES OF A VERSION
- * PATCH /projects/:projectId/reports/:reportId
- */
 exports.updateRapportNotes = async (req, res) => {
   try {
     const { projectId, reportId } = req.params;
