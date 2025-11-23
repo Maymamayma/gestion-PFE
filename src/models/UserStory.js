@@ -1,28 +1,34 @@
 const mongoose = require("mongoose");
 
 const UserStorySchema = new mongoose.Schema({
-  titre: { type: String, required: true, minlength: 3, maxlength: 255 },
-  description: { type: String, required: true, minlength: 10 },
-  priorite: {
-    type: String,
-    enum: ["Haute", "Moyenne", "Basse"],
-    required: true,
-  },
-  acceptance: { type: String, required: true, minlength: 10 },
-
-  sprint: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Sprint",
-    required: true,
-  },
-  projet: {
-    type: mongoose.Schema.Types.ObjectId,
+  project: {
+    type: mongoose.Schema.ObjectId,
     ref: "Project",
     required: true,
   },
-
-  dateCreation: { type: Date, default: Date.now },
-  dateModification: { type: Date, default: Date.now },
+  sprint: {
+    type: mongoose.Schema.ObjectId,
+    ref: "Sprint",
+    required: true,
+  },
+  title: {
+    type: String,
+    required: [true, "Veuillez ajouter un titre à l'User Story"],
+    trim: true,
+    maxlength: [100, "Le titre ne peut pas dépasser 100 caractères"],
+  },
+  description: {
+    type: String,
+    required: [true, "Veuillez ajouter une description"],
+  },
+  priority: {
+    type: Number,
+    default: 0,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 module.exports = mongoose.model("UserStory", UserStorySchema);

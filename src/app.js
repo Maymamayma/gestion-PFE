@@ -2,9 +2,7 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
-const authRoutes = require("./routes/auth");
-const userStoriesRoutes = require("./routes/userStories");
-const rapportsRoutes = require("./routes/rapports");
+const userStoriesRoutes = require("./routes/userstory.routes");
 
 const app = express();
 
@@ -14,9 +12,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/version", userStoriesRoutes);
-app.use("/api/version", rapportsRoutes);
+
+app.use("/", userStoriesRoutes);
 
 // Route de test
 app.get("/api/health", (req, res) => {
