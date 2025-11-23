@@ -3,33 +3,13 @@ const express = require("express");
 const router = express.Router();
 
 const {
-  getUserStoriesByPriority,
-  updateUserStoryPriority,
-  getUserStoriesStatsByPriority,
+  prioritizeUserStory,
+  getPrioritizedUserStories,
 } = require("../controllers/userstoryPriority.controller");
 
-const { authenticate, authorize } = require("../middleware/auth");
-
-// FILTER + SORT + PAGINATION
-router.get(
-  "/projects/:projectId/sprints/:sprintId/userStories/filter",
-  authenticate,
-  getUserStoriesByPriority
-);
+// VIEW user stories by priority
+router.route("/prioritized").get(getPrioritizedUserStories);
 
 // UPDATE priority
-router.patch(
-  "/projects/:projectId/sprints/:sprintId/userStories/:userStoryId/priority",
-  authenticate,
-  authorize("ETUDIANT"),
-  updateUserStoryPriority
-);
-
-// STATS by priority
-router.get(
-  "/projects/:projectId/sprints/:sprintId/userStories/stats/priority",
-  authenticate,
-  getUserStoriesStatsByPriority
-);
-
+router.route("/:userStoryId/prioritize").patch(prioritizeUserStory);
 module.exports = router;

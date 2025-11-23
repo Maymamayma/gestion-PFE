@@ -1,131 +1,51 @@
-// src/controllers/userstoryPriority.controller.js
 const UserStory = require("../models/UserStory");
-const mongoose = require("mongoose");
 
-/**
- * FILTER + SORT + PAGINATION
- * /projects/:projectId/sprints/:sprintId/userStories/filter
- */
-exports.getUserStoriesByPriority = async (req, res) => {
+exports.prioritizeUserStory = async (req, res, next) => {
   try {
-    const { projectId, sprintId } = req.params;
-    const { priorite, sort = "asc", page = 1, limit = 10 } = req.query;
+    const { userStoryId } = req.params;
+    const { priority } = req.body; // priority est le nouveau rang (e.g., 1, 2, 3...)
 
-    const filter = {
-      sprint: sprintId,
-      projet: projectId,
-    };
-
-    // Si l'utilisateur filtre par priorité
-    if (priorite) {
-      filter.priorite = priorite;
+    if (typeof priority !== "number" || priority < 0) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          error: "La priorité doit être un nombre positif.",
+        });
     }
 
-    const skip = (page - 1) * limit;
-
-    const userStories = await UserStory.find(filter)
-      .sort({ priorite: sort === "desc" ? -1 : 1 })
-      .skip(skip)
-      .limit(parseInt(limit))
-      .populate("sprint");
-
-    const total = await UserStory.countDocuments(filter);
-
-    res.json({
-      message: "User Stories filtrées avec succès",
-      userStories,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total,
-        pages: Math.ceil(total / limit),
-      },
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-/**
- * UPDATE PRIORITY
- * /projects/:projectId/sprints/:sprintId/userStories/:userStoryId/priority
- */
-exports.updateUserStoryPriority = async (req, res) => {
-  try {
-    const { projectId, sprintId, userStoryId } = req.params;
-    const { priorite } = req.body;
-
-    const validPriorities = ["Haute", "Moyenne", "Basse"];
-    if (!validPriorities.includes(priorite)) {
-      return res.status(400).json({ message: "Priorité invalide" });
-    }
-
-    const userStory = await UserStory.findOneAndUpdate(
-      {
-        _id: userStoryId,
-        sprint: sprintId,
-        projet: projectId,
-      },
-      {
-        priorite,
-        dateModification: Date.now(),
-      },
-      { new: true }
-    );
+    let userStory = await UserStory.findById(userStoryId);
 
     if (!userStory) {
-      return res.status(404).json({ message: "User Story non trouvée" });
+      return res
+        .status(404)
+        .json({ success: false, error: "User Story non trouvée" });
     }
 
-    res.json({
-      message: "Priorité mise à jour avec succès",
-      userStory,
+    userStory.priority = priority;
+    await userStory.save();
+
+    res.status(200).json({
+      success: true,
+      data: userStory,
     });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
   }
 };
 
-/**
- * STATS BY PRIORITY
- * /projects/:projectId/sprints/:sprintId/userStories/stats/priority
- */
-exports.getUserStoriesStatsByPriority = async (req, res) => {
+exports.getPrioritizedUserStories = async (req, res, next) => {
   try {
-    const { projectId, sprintId } = req.params;
+    const userStories = await UserStory.find({
+      sprint: req.params.sprintId,
+    }).sort("priority");
 
-    const stats = await UserStory.aggregate([
-      {
-        $match: {
-          sprint: new mongoose.Types.ObjectId(sprintId),
-          projet: new mongoose.Types.ObjectId(projectId),
-        },
-      },
-      {
-        $group: {
-          _id: "$priorite",
-          count: { $sum: 1 },
-        },
-      },
-    ]);
-
-    const result = {
-      Haute: 0,
-      Moyenne: 0,
-      Basse: 0,
-      total: 0,
-    };
-
-    stats.forEach((item) => {
-      result[item._id] = item.count;
-      result.total += item.count;
+    res.status(200).json({
+      success: true,
+      count: userStories.length,
+      data: userStories,
     });
-
-    res.json({
-      message: "Statistiques par priorité récupérées",
-      stats: result,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
   }
 };
