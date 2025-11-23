@@ -3,23 +3,14 @@ const express = require("express");
 const router = express.Router();
 
 const {
-  getRapportsByProjectId,
-  downloadRapport,
-  deleteRapport,
-  getReportHistory,
+  listHistory,
+  downloadReport,
 } = require("../controllers/reportHistory.controller");
 
-const { authenticate, authorize } = require("../middleware/auth");
+// List all report versions for a project
+router.get("/projects/:projectId/reports", listHistory);
 
-// LIST all versions
-router.get("/reports", getRapportsByProjectId);
-
-// DOWNLOAD a version
-router.get("/reports/download/:reportId", downloadRapport);
-
-// DELETE a version
-router.delete("/reports/:reportId", deleteRapport);
-
-router.get("/reports", getReportHistory);
+// Download a specific report version
+router.get("projects/:projectId/reports/:reportId/download", downloadReport);
 
 module.exports = router;
