@@ -1,77 +1,36 @@
-// controllers/reportHistory.controller.js
+const path = require("path");
+const ReportHistoryService = require("../services/reportHistory.service");
 
-const ReportHistory = require("../models/reportHistory.model");
+module.exports = {
+  listHistory: async (req, res) => {
+    try {
+      const { projectId } = req.params;
 
-// Create a new report
-exports.createReport = async (req, res) => {
-  try {
-    const report = new ReportHistory(req.body);
-    await report.save();
-    res.status(201).json({ message: "Report created successfully", report });
-  } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Failed to create report", error: error.message });
-  }
-};
+      const reports = await ReportHistoryService.listReports(projectId);
 
-// Get all reports
-exports.getAllReports = async (req, res) => {
-  try {
-    const reports = await ReportHistory.find();
-    res.status(200).json(reports);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to fetch reports", error: error.message });
-  }
-};
+      if (!reports || reports.length === 0) {
+        return res.status(404).json({ error: "No reports found" });
+      }
 
-// Get a single report by ID
-exports.getReportById = async (req, res) => {
-  try {
-    const report = await ReportHistory.findById(req.params.id);
-    if (!report) {
-      return res.status(404).json({ message: "Report not found" });
+      res.json(reports);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
-    res.status(200).json(report);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to fetch report", error: error.message });
-  }
-};
+  },
 
-// Update a report by ID
-exports.updateReport = async (req, res) => {
-  try {
-    const report = await ReportHistory.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    if (!report) {
-      return res.status(404).json({ message: "Report not found" });
-    }
-    res.status(200).json({ message: "Report updated successfully", report });
-  } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Failed to update report", error: error.message });
-  }
-};
+  downloadReport: async (req, res) => {
+    try {
+      const { reportId } = req.params;
 
-// Delete a report by ID
-exports.deleteReport = async (req, res) => {
-  try {
-    const report = await ReportHistory.findByIdAndDelete(req.params.id);
-    if (!report) {
-      return res.status(404).json({ message: "Report not found" });
+      const report = await ReportHistoryService.getReportById(reportId);
+      if (!report) {
+        return res.status(404).json({ error: "Report not found" });
+      }
+
+      const filePath = path.resolve(report.filePath);
+      res.download(filePath, report.fileName);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
-    res.status(200).json({ message: "Report deleted successfully" });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to delete report", error: error.message });
-  }
+  },
 };
