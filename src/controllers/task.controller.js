@@ -11,7 +11,7 @@ module.exports = {
       const userStory = await UserStory.findOne({
         _id: userStoryId,
         sprintId: sprintId,
-        projectId: projectId
+        projectId: projectId,
       });
 
       if (!userStory) {
@@ -26,12 +26,12 @@ module.exports = {
         userStoryId,
         sprintId,
         projectId,
-        createdBy: req.user?.id || "temporary_user_id" // À remplacer par l'authentification
+        createdBy: req.user?.id || "temporary_user_id",
       });
 
       res.status(201).json({
         message: "Task created successfully",
-        task: newTask
+        task: newTask,
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -67,7 +67,8 @@ module.exports = {
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  },
+
   updateTask: async (req, res) => {
     try {
       const { taskId } = req.params;
@@ -83,12 +84,12 @@ module.exports = {
       const updatedTask = await TaskService.update(taskId, {
         title,
         description,
-        priority
+        priority,
       });
 
       res.json({
         message: "Task updated successfully",
-        task: updatedTask
+        task: updatedTask,
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -109,10 +110,10 @@ module.exports = {
       await TaskService.delete(taskId);
 
       res.json({
-        message: "Task deleted successfully"
+        message: "Task deleted successfully",
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  },
 };
