@@ -68,4 +68,51 @@ module.exports = {
       res.status(500).json({ error: error.message });
     }
   }
+  updateTask: async (req, res) => {
+    try {
+      const { taskId } = req.params;
+      const { title, description, priority } = req.body;
+
+      // Vérifier que la tâche existe
+      const task = await TaskService.getById(taskId);
+      if (!task) {
+        return res.status(404).json({ error: "Task not found" });
+      }
+
+      // Mettre à jour
+      const updatedTask = await TaskService.update(taskId, {
+        title,
+        description,
+        priority
+      });
+
+      res.json({
+        message: "Task updated successfully",
+        task: updatedTask
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  deleteTask: async (req, res) => {
+    try {
+      const { taskId } = req.params;
+
+      // Vérifier que la tâche existe
+      const task = await TaskService.getById(taskId);
+      if (!task) {
+        return res.status(404).json({ error: "Task not found" });
+      }
+
+      // Supprimer
+      await TaskService.delete(taskId);
+
+      res.json({
+        message: "Task deleted successfully"
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 };
