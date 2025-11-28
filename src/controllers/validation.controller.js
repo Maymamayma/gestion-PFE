@@ -6,15 +6,15 @@ module.exports = {
   validateTask: async (req, res) => {
     try {
       const { taskId } = req.params;
-      const { estValide, commentaire } = req.body;
+      const { isValid, comment } = req.body;
 
       const task = await Task.findById(taskId);
       if (!task) return res.status(404).json({ error: "Task not found" });
 
       const validation = await ValidationService.create({
         taskId,
-        estValide,
-        commentaire,
+        isValid,
+        comment,
         typeValidation: "Tache",
         validatedBy: req.user?.id || "temporary_user_id",
       });
