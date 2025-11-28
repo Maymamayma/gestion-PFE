@@ -4,8 +4,10 @@ const {
   createTask,
   listTasks,
   getTask,
-  updateTask,     
-  deleteTask     
+  updateTask,
+  deleteTask,
+  updateTaskStatus,   
+  getTaskHistory  
 } = require("../controllers/task.controller");
 
 // CREATE Task
@@ -25,5 +27,11 @@ router.put("/tasks/:taskId", updateTask);
 
 // DELETE Task
 router.delete("/tasks/:taskId", deleteTask);
+
+// UPDATE Task Status (avec historique automatique)
+router.patch("/tasks/:taskId/status", updateTaskStatus);
+
+// GET Task History
+router.get("/tasks/:taskId/history", getTaskHistory);
 
 module.exports = router;

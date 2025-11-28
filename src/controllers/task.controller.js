@@ -116,4 +116,71 @@ module.exports = {
       res.status(500).json({ error: error.message });
     }
   },
+  updateTaskStatus: async (req, res) => {
+    try {
+      const { taskId } = req.params;
+      const { status, notes } = req.body;
+
+      // Vérifier que la tâche existe
+      const task = await TaskService.getById(taskId);
+      if (!task) {
+        return res.status(404).json({ error: "Task not found" });
+      }
+
+      const oldStatus = task.status;
+
+      // Si le statut n'a pas changé
+      if (oldStatus === status) {
+        return res.status(200).json({
+          message: "Status unchanged",
+          task,
+        });
+      }
+
+      // Mettre à jour le statut
+      const updatedTask = await TaskService.update(taskId, { status });
+
+      // Créer l'historique
+      const TaskHistory = require("../models/TaskHistory.model");
+      await TaskHistory.create({
+        taskId,
+        oldStatus,
+        newStatus: status,
+        changedBy: req.user?.id || "temporary_user_id",
+        notes,
+      });
+
+      res.json({
+        message: "Task status updated and history logged",
+        task: updatedTask,
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  getTaskHistory: async (req, res) => {
+    try {
+      const { taskId } = req.params;
+
+      // Vérifier que la tâche existe
+      const task = await TaskService.getById(taskId);
+      if (!task) {
+        return res.status(404).json({ error: "Task not found" });
+      }
+
+      // Récupérer l'historique
+      const TaskHistory = require("../models/TaskHistory.model");
+      const history = await TaskHistory.find({ taskId })
+        .sort({ changedAt: -1 })
+        .populate("changedBy", "user_name email");
+
+      res.json({
+        message: "Task history retrieved successfully",
+        history,
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
 };
