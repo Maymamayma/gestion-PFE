@@ -1,4 +1,4 @@
-const UserStory = require("../models/UerStory.model");
+const UserStory = require("../models/UserStory.model"); 
 
 module.exports = {
   create: (data) => UserStory.create(data),

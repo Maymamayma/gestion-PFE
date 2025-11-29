@@ -5,6 +5,9 @@ require("dotenv").config();
 const userStoriesRoutes = require("./routes/userstory.routes");
 const taskRoutes = require("./routes/task.routes");
 const validationRoutes = require("./routes/validation.routes");
+const reportRoutes = require("./routes/report.routes");
+const reportHistoryRoutes = require("./routes/reportHistory.routes");
+const sprintReportRoutes = require("./routes/sprintReport.routes");
 
 const app = express();
 
@@ -18,6 +21,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/", userStoriesRoutes);
 app.use("/", taskRoutes);
 app.use("/", validationRoutes);
+app.use("/", reportRoutes);
+app.use("/", reportHistoryRoutes);
+app.use("/", sprintReportRoutes);
 
 // Route de test
 app.get("/api/health", (req, res) => {
