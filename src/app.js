@@ -8,6 +8,8 @@ const validationRoutes = require("./routes/validation.routes");
 const reportRoutes = require("./routes/report.routes");
 const reportHistoryRoutes = require("./routes/reportHistory.routes");
 const sprintReportRoutes = require("./routes/sprintReport.routes");
+const projectReportRoutes = require("./routes/projectReport.routes");
+
 
 const app = express();
 
@@ -24,6 +26,7 @@ app.use("/", validationRoutes);
 app.use("/", reportRoutes);
 app.use("/", reportHistoryRoutes);
 app.use("/", sprintReportRoutes);
+app.use("/", projectReportRoutes);
 
 // Route de test
 app.get("/api/health", (req, res) => {
