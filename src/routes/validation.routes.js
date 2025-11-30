@@ -2,13 +2,30 @@ const express = require("express");
 const router = express.Router();
 const {
   validateTask,
-  getTaskValidations,
+  getTaskValidations
 } = require("../controllers/validation.controller");
+const { authenticate, authorize } = require("../middleware/auth");
+const validate = require("../middleware/validate");
 
-// Valider une tâche
-router.post("/tasks/:taskId/validate", validateTask);
+// Import du schéma de validation
+const { validateTaskSchema } = require("../validators/validation.validator");
+const { taskIdParamSchema } = require("../validators/task.validator");
 
-// Récupérer validations d’une tâche
-router.get("/tasks/:taskId/validations", getTaskValidations);
+// Valider une tâche (avec validation Zod)
+router.post(
+  "/tasks/:taskId/validate",
+  authenticate,
+  authorize(["ENCADRANT_ENTREPRISE", "ENCADRANT_UNIVERSITAIRE"]),
+  validate(validateTaskSchema),
+  validateTask
+);
+
+// Récupérer validations d'une tâche (avec validation Zod)
+router.get(
+  "/tasks/:taskId/validations",
+  authenticate,
+  validate(taskIdParamSchema),
+  getTaskValidations
+);
 
 module.exports = router;
