@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { User } from "../models/User.models.js";
+import { User } from "../models/User.model.js";
 export const signup = async (req, res) => {
   try {
     //vérifier si l'email existe ou non
