@@ -12,7 +12,7 @@ import { router as taskRouter } from "./routes/task.routes.js";
 import { router as userStoryRouter } from "./routes/userstory.routes.js";
 import { router as validationRouter } from "./routes/validation.routes.js";
 
-import connectDB from './config/database.js';
+import connectDB from './config/db.js';
 import { errorHandler } from './middleware/errorHandler.js'; 
 
 const app = express();
