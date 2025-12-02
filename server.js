@@ -1,14 +1,14 @@
-import app from './src/app.js';
+import dotenv from "dotenv";
+import connectDB from "./src/config/db.js";
+import app from "./src/app.js";
+dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
-const server = app.listen(PORT, () => {
-  console.log('='.repeat(50));
-  console.log(`🚀 Server is running on port ${PORT}`);
-  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌐 API URL: http://localhost:${PORT}/api`);
-  console.log(`💚 Health check: http://localhost:${PORT}/health`);
-  console.log('='.repeat(50));
-});
+// Connect to MongoDB
+connectDB();
 
-export default server;
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
