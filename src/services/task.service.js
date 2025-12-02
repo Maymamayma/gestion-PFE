@@ -1,16 +1,16 @@
 import { Task } from "../models/Task.model.js";
 
 export const TaskService = {
-  createTask: (data) => Task.create(data),
-  listTasks: (projectId, filters = {}) => {
+  create: (data) => Task.create(data),
+  list: (projectId, filters = {}) => {
     const query = { projectId, ...filters };
     return Task.find(query).populate("userStoryId").populate("sprintId");
   },
-  getTaskById: (id) =>
+  getById: (id) =>
     Task.findById(id).populate("userStoryId").populate("sprintId"),
-  updateTask: (id, data) => {
+  update: (id, data) => {
     data.updatedAt = Date.now();
     return Task.findByIdAndUpdate(id, data, { new: true });
   },
-  removeTask: (id) => Task.findByIdAndDelete(id),
+  delete: (id) => Task.findByIdAndDelete(id),
 };
