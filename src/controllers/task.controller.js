@@ -1,6 +1,6 @@
 import { TaskService } from "../services/task.service.js";
 import { UserStory } from "../models/UserStory.model.js";
-
+import { TaskHistory } from "../models/TaskHistory.model.js";
 export const createTask = async (req, res) => {
   try {
     const { projectId, sprintId, userStoryId } = req.params;
@@ -136,7 +136,6 @@ export const updateTaskStatus = async (req, res) => {
     const updatedTask = await TaskService.update(taskId, { status });
 
     // Créer l'historique
-    const TaskHistory = require("../models/TaskHistory.model");
     await TaskHistory.create({
       taskId,
       oldStatus,
@@ -164,7 +163,7 @@ export const getTaskHistory = async (req, res) => {
     }
 
     // Récupérer l'historique
-    const TaskHistory = require("../models/TaskHistory.model");
+
     const history = await TaskHistory.find({ taskId })
       .sort({ changedAt: -1 })
       .populate("changedBy", "user_name email");
