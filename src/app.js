@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
 
 import { router as userRouter } from "./routes/user.routes.js";
@@ -12,8 +12,8 @@ import { router as taskRouter } from "./routes/task.routes.js";
 import { router as userStoryRouter } from "./routes/userstory.routes.js";
 import { router as validationRouter } from "./routes/validation.routes.js";
 
-import connectDB from './config/db.js';
-import errorHandler from './middleware/errorHandler.js'; 
+import connectDB from "./config/db.js";
+import errorHandler from "./middleware/errorHandler.js";
 
 const app = express();
 
@@ -41,11 +41,11 @@ app.get("/api/health", (req, res) => {
 });
 
 // Route 404
-app.use('*', (req, res) => {
+app.use((req, res, next) => {
   res.status(404).json({
     success: false,
-    message: 'Route not found',
-    path: req.originalUrl
+    message: "Route not found",
+    path: req.originalUrl,
   });
 });
 

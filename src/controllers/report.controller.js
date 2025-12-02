@@ -1,28 +1,26 @@
-const ReportService = require("../services/report.service");
+import { createVersion } from "../services/report.service.js";
 
-module.exports = {
-  uploadReportVersion: async (req, res) => {
-    try {
-      const { projectId } = req.params;
-      const { date } = req.body;
+export const uploadReportVersion = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const { date } = req.body;
 
-      if (!req.file) {
-        return res.status(400).json({ error: "PDF file is required" });
-      }
-
-      const report = await ReportService.createVersion(
-        projectId,
-        date,
-        req.file.filename,
-        req.file.path
-      );
-
-      res.status(201).json({
-        message: "Report version uploaded successfully",
-        report,
-      });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+    if (!req.file) {
+      return res.status(400).json({ error: "PDF file is required" });
     }
-  },
+
+    const report = await createVersion(
+      projectId,
+      date,
+      req.file.filename,
+      req.file.path
+    );
+
+    res.status(201).json({
+      message: "Report version uploaded successfully",
+      report,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };

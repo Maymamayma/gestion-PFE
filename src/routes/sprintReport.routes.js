@@ -1,8 +1,12 @@
-const express = require("express");
+import express from "express";
+import { generateSprintReport } from "../controllers/sprintReport.controller.js";
+
 const router = express.Router();
-const { generateSprintReport } = require("../controllers/sprintReport.controller");
 
 // Générer rapport HTML pour un sprint
-router.get("/projects/:projectId/sprints/:sprintId/report", generateSprintReport);
+router.get(
+  "/projects/:projectId/sprints/:sprintId/report",
+  generateSprintReport
+);
 
-module.exports = router;
+export { router };

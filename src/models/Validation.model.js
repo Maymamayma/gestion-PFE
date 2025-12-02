@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const ValidationSchema = new mongoose.Schema({
   taskId: {
@@ -30,4 +30,4 @@ const ValidationSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Validation", ValidationSchema);
+export const Validation = mongoose.model("Validation", ValidationSchema);

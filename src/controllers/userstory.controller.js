@@ -1,74 +1,67 @@
-const UserStoryService = require("../services/userStory.service");
+import { create } from "../services/userStory.service.js";
 
-module.exports = {
-  createUserStory: async (req, res) => {
-    try {
-      const { projectId, sprintId } = req.params;
+export const createUserStory = async (req, res) => {
+  try {
+    const { projectId, sprintId } = req.params;
 
-      const newStory = await UserStoryService.create({
-        ...req.body,
-        projectId,
-        sprintId,
-      });
+    const newStory = await create({
+      ...req.body,
+      projectId,
+      sprintId,
+    });
 
-      res.status(201).json(newStory);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  },
+    res.status(201).json(newStory);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+export const listUserStories = async (req, res) => {
+  try {
+    const { projectId, sprintId } = req.params;
 
-  listUserStories: async (req, res) => {
-    try {
-      const { projectId, sprintId } = req.params;
+    const stories = await UserStoryService.list(projectId, sprintId);
+    res.json(stories);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+export const getUserStory = async (req, res) => {
+  try {
+    const { userStoryId } = req.params;
+    const story = await UserStoryService.getById(userStoryId);
 
-      const stories = await UserStoryService.list(projectId, sprintId);
-      res.json(stories);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  },
+    if (!story) return res.status(404).json({ error: "User story not found" });
 
-  getUserStory: async (req, res) => {
-    try {
-      const { userStoryId } = req.params;
-      const story = await UserStoryService.getById(userStoryId);
+    res.json(story);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+export const updateUserStory = async (req, res) => {
+  try {
+    const { userStoryId } = req.params;
 
-      if (!story)
-        return res.status(404).json({ error: "User story not found" });
+    const updated = await UserStoryService.update(userStoryId, req.body);
 
-      res.json(story);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  },
+    if (!updated)
+      return res.status(404).json({ error: "User story not found" });
 
-  updateUserStory: async (req, res) => {
-    try {
-      const { userStoryId } = req.params;
+    res.json(updated);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+export const deleteUserStory = async (req, res) => {
+  try {
+    const { userStoryId } = req.params;
 
-      const updated = await UserStoryService.update(userStoryId, req.body);
+    const deleted = await UserStoryService.delete(userStoryId);
 
-      if (!updated)
-        return res.status(404).json({ error: "User story not found" });
+    if (!deleted)
+      return res.status(404).json({ error: "User story not found" });
 
-      res.json(updated);
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  },
-
-  deleteUserStory: async (req, res) => {
-    try {
-      const { userStoryId } = req.params;
-
-      const deleted = await UserStoryService.delete(userStoryId);
-
-      if (!deleted)
-        return res.status(404).json({ error: "User story not found" });
-
-      res.json({ message: "User story deleted" });
-    } catch (error) {
-      res.status(400).json({ error: error.message });
-    }
-  },
+    res.json({ message: "User story deleted" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 };

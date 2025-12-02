@@ -1,9 +1,8 @@
-// src/routes/report.routes.js
-const express = require("express");
-const router = express.Router();
-const upload = require("../middleware/uploadReport");
+import express from "express";
+import upload from "../middleware/uploadReport.js";
+import { uploadReportVersion } from "../controllers/report.controller.js";
 
-const { uploadReportVersion } = require("../controllers/report.controller");
+const router = express.Router();
 
 // UPLOAD new Version
 router.post(
@@ -12,4 +11,4 @@ router.post(
   uploadReportVersion
 );
 
-module.exports = router;
+export { router };

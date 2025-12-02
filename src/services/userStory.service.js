@@ -1,13 +1,13 @@
-const UserStory = require("../models/UserStory.model"); 
+import { UserStory } from "../models/UserStory.model.js";
 
-module.exports = {
-  create: (data) => UserStory.create(data),
+export const create = (data) => UserStory.create(data);
 
-  list: (projectId, sprintId) => UserStory.find({ projectId, sprintId }),
+export const list = (projectId, sprintId) =>
+  UserStory.find({ projectId, sprintId });
 
-  getById: (id) => UserStory.findById(id),
+export const getById = (id) => UserStory.findById(id);
 
-  update: (id, data) => UserStory.findByIdAndUpdate(id, data, { new: true }),
+export const update = (id, data) =>
+  UserStory.findByIdAndUpdate(id, data, { new: true });
 
-  delete: (id) => UserStory.findByIdAndDelete(id),
-};
+export const remove = (id) => UserStory.findByIdAndDelete(id);

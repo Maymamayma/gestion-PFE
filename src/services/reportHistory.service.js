@@ -1,11 +1,10 @@
-const Report = require("../models/report.model");
+import { Report } from "../models/report.model.js";
 
-module.exports = {
-  listReports: async (projectId) => {
+export default {
+  async listReports(projectId) {
     return Report.find({ projectId }).sort({ version: -1 });
   },
-
-  getReportById: async (reportId) => {
+  async getReportById(reportId) {
     return Report.findById(reportId);
   },
 };

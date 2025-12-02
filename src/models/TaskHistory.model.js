@@ -1,33 +1,33 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const TaskHistorySchema = new mongoose.Schema({
   taskId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Task",
-    required: true
+    required: true,
   },
   oldStatus: {
     type: String,
     enum: ["ToDo", "InProgress", "Standby", "Done"],
-    required: true
+    required: true,
   },
   newStatus: {
     type: String,
     enum: ["ToDo", "InProgress", "Standby", "Done"],
-    required: true
+    required: true,
   },
   changedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true
+    required: true,
   },
   notes: {
-    type: String
+    type: String,
   },
   changedAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
-module.exports = mongoose.model("TaskHistory", TaskHistorySchema);
+export const TaskHistory = mongoose.model("TaskHistory", TaskHistorySchema);

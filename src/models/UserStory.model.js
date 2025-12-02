@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const UserStorySchema = new mongoose.Schema({
   title: { type: String, required: true, minlength: 3, maxlength: 255 },
@@ -17,4 +17,4 @@ const UserStorySchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("UserStory", UserStorySchema);
+export const UserStory = mongoose.model("UserStory", UserStorySchema);

@@ -1,23 +1,16 @@
-const Task = require("../models/Task.model");
+import { Task } from "../models/Task.model.js";
 
-module.exports = {
-  create: (data) => Task.create(data),
-
-  list: (projectId, filters = {}) => {
+export const TaskService = {
+  createTask: (data) => Task.create(data),
+  listTasks: (projectId, filters = {}) => {
     const query = { projectId, ...filters };
-    return Task.find(query)
-      .populate("userStoryId")
-      .populate("sprintId");
+    return Task.find(query).populate("userStoryId").populate("sprintId");
   },
-
-  getById: (id) => Task.findById(id)
-    .populate("userStoryId")
-    .populate("sprintId"),
-
-  update: (id, data) => {
+  getTaskById: (id) =>
+    Task.findById(id).populate("userStoryId").populate("sprintId"),
+  updateTask: (id, data) => {
     data.updatedAt = Date.now();
     return Task.findByIdAndUpdate(id, data, { new: true });
   },
-
-  delete: (id) => Task.findByIdAndDelete(id)
+  removeTask: (id) => Task.findByIdAndDelete(id),
 };

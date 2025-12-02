@@ -1,10 +1,10 @@
-module.exports = {
-  generateSprintReportHTML: (sprint, tasks, history) => {
-    const totalTasks = tasks.length;
-    const doneTasks = tasks.filter(t => t.status === "Done").length;
-    const progressPercent = totalTasks > 0 ? ((doneTasks / totalTasks) * 100).toFixed(2) : 0;
+export const generateSprintReportHTML = (sprint, tasks, history) => {
+  const totalTasks = tasks.length;
+  const doneTasks = tasks.filter((t) => t.status === "Done").length;
+  const progressPercent =
+    totalTasks > 0 ? ((doneTasks / totalTasks) * 100).toFixed(2) : 0;
 
-    return `
+  return `
       <!DOCTYPE html>
       <html lang="fr">
         <head>
@@ -37,7 +37,15 @@ module.exports = {
           <div class="container">
             <h1>📊 Rapport Sprint ${sprint.numero || "N/A"}</h1>
             <p><strong>Nom :</strong> ${sprint.nom || "Sprint"}</p>
-            <p><strong>Période :</strong> ${sprint.dateDebut ? new Date(sprint.dateDebut).toLocaleDateString('fr-FR') : "N/A"} → ${sprint.dateFin ? new Date(sprint.dateFin).toLocaleDateString('fr-FR') : "N/A"}</p>
+            <p><strong>Période :</strong> ${
+              sprint.dateDebut
+                ? new Date(sprint.dateDebut).toLocaleDateString("fr-FR")
+                : "N/A"
+            } → ${
+    sprint.dateFin
+      ? new Date(sprint.dateFin).toLocaleDateString("fr-FR")
+      : "N/A"
+  }</p>
 
             <h2>📈 Avancement du Sprint</h2>
             <div class="progress-container">
@@ -56,14 +64,26 @@ module.exports = {
                 </tr>
               </thead>
               <tbody>
-                ${tasks.length > 0 ? tasks.map(t => `
+                ${
+                  tasks.length > 0
+                    ? tasks
+                        .map(
+                          (t) => `
                   <tr>
                     <td><strong>${t.title}</strong></td>
                     <td>${t.description}</td>
-                    <td><span class="status status-${t.status.toLowerCase()}">${t.status}</span></td>
-                    <td><span class="priority priority-${t.priority.toLowerCase()}">${t.priority}</span></td>
+                    <td><span class="status status-${t.status.toLowerCase()}">${
+                            t.status
+                          }</span></td>
+                    <td><span class="priority priority-${t.priority.toLowerCase()}">${
+                            t.priority
+                          }</span></td>
                   </tr>
-                `).join("") : '<tr><td colspan="4">Aucune tâche</td></tr>'}
+                `
+                        )
+                        .join("")
+                    : '<tr><td colspan="4">Aucune tâche</td></tr>'
+                }
               </tbody>
             </table>
 
@@ -79,24 +99,37 @@ module.exports = {
                 </tr>
               </thead>
               <tbody>
-                ${history.length > 0 ? history.map(h => `
+                ${
+                  history.length > 0
+                    ? history
+                        .map(
+                          (h) => `
                   <tr>
                     <td>${h.taskId?.title || "N/A"}</td>
-                    <td><span class="status status-${h.oldStatus.toLowerCase()}">${h.oldStatus}</span></td>
-                    <td><span class="status status-${h.newStatus.toLowerCase()}">${h.newStatus}</span></td>
-                    <td>${new Date(h.changedAt).toLocaleString('fr-FR')}</td>
-                    <td>${h.changedBy?.user_name || h.changedBy?.email || "Inconnu"}</td>
+                    <td><span class="status status-${h.oldStatus.toLowerCase()}">${
+                            h.oldStatus
+                          }</span></td>
+                    <td><span class="status status-${h.newStatus.toLowerCase()}">${
+                            h.newStatus
+                          }</span></td>
+                    <td>${new Date(h.changedAt).toLocaleString("fr-FR")}</td>
+                    <td>${
+                      h.changedBy?.user_name || h.changedBy?.email || "Inconnu"
+                    }</td>
                   </tr>
-                `).join("") : '<tr><td colspan="5">Aucun historique</td></tr>'}
+                `
+                        )
+                        .join("")
+                    : '<tr><td colspan="5">Aucun historique</td></tr>'
+                }
               </tbody>
             </table>
 
             <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #888;">
-              <p>Rapport généré le ${new Date().toLocaleString('fr-FR')}</p>
+              <p>Rapport généré le ${new Date().toLocaleString("fr-FR")}</p>
             </footer>
           </div>
         </body>
       </html>
     `;
-  }
 };
