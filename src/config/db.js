@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-
+import mongoose from "mongoose";
 const MONGO_URL =
   process.env.MONGO_URL ||
   "mongodb+srv://eyamo:ZB3Y9Kz732RrnNM9@backenddb.gbwra9c.mongodb.net/Node-API?appName=BackendDB";

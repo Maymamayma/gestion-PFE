@@ -1,40 +1,37 @@
-const ValidationService = require("../services/validation.service");
-const Task = require("../models/Task.model");
-const Reunion = require("../models/Reunion.model");
+import { create } from "../services/validation.service.js";
 
-module.exports = {
-  validateTask: async (req, res) => {
-    try {
-      const { taskId } = req.params;
-      const { isValid, comment } = req.body;
+import { Task } from "../models/Task.model.js";
 
-      const task = await Task.findById(taskId);
-      if (!task) return res.status(404).json({ error: "Task not found" });
+export const validateTask = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const { isValid, comment } = req.body;
 
-      const validation = await ValidationService.create({
-        taskId,
-        isValid,
-        comment,
-        typeValidation: "Tache",
-        validatedBy: req.user?.id || "temporary_user_id",
-      });
+    const task = await Task.findById(taskId);
+    if (!task) return res.status(404).json({ error: "Task not found" });
 
-      res.json({
-        message: "Task validated",
-        validation,
-      });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
+    const validation = await create({
+      taskId,
+      isValid,
+      comment,
+      typeValidation: "Tache",
+      validatedBy: req.user?.id || "temporary_user_id",
+    });
 
-  getTaskValidations: async (req, res) => {
-    try {
-      const { taskId } = req.params;
-      const validations = await ValidationService.listByTask(taskId);
-      res.json(validations);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
+    res.json({
+      message: "Task validated",
+      validation,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+export const getTaskValidations = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+    const validations = await ValidationService.listByTask(taskId);
+    res.json(validations);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };

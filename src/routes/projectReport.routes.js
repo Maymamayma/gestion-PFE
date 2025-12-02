@@ -3,7 +3,10 @@ import * as generateProjectReport from "../controllers/projectReport.controller.
 
 export const router = express.Router();
 
-router.get("/projects/:projectId/report", generateProjectReport);
+router.get(
+  "/projects/:projectId/report",
+  generateProjectReport.generateProjectReport
+);
 //const express = require("express");
 //const router = express.Router();
 //const { generateProjectReport } = require("../controllers/projectReport.controller");

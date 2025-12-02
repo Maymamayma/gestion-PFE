@@ -1,12 +1,12 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const {
+import {
   createUserStory,
   updateUserStory,
   deleteUserStory,
   getUserStory,
   listUserStories,
-} = require("../controllers/userstory.controller");
+} from "../controllers/userstory.controller.js";
 
 // CREATE User Story
 router.post(
@@ -36,4 +36,4 @@ router.delete(
   deleteUserStory
 );
 
-module.exports = router;
+export { router };

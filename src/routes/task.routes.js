@@ -1,32 +1,35 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const {
+import {
   createTask,
   listTasks,
   getTask,
   updateTask,
   deleteTask,
   updateTaskStatus,
-  getTaskHistory
-} = require("../controllers/task.controller");
-const { authenticate, authorize } = require("../middleware/auth");
-const validate = require("../middleware/validate");
+  getTaskHistory,
+} from "../controllers/task.controller.js";
+import {
+  loggedMiddleware as authenticate,
+  isStudent as authorize,
+} from "../middleware/auth.js";
+import { validate } from "../middleware/validate.js";
 
 // Import des schémas de validation
-const {
+import {
   createTaskSchema,
   updateTaskSchema,
   taskIdParamSchema,
-  listTasksQuerySchema
-} = require("../validators/task.validator");
-const { updateTaskStatusSchema } = require("../validators/taskStatus.validator");
+  listTasksQuerySchema,
+} from "../validators/task.validator.js";
+import { updateTaskStatusSchema } from "../validators/taskStatus.validator.js";
 
 // CREATE Task (avec validation)
 router.post(
   "/projects/:projectId/sprints/:sprintId/userStories/:userStoryId/tasks",
   authenticate,
-  authorize("ETUDIANT"),
-  validate(createTaskSchema),  // ← Validation Zod
+  authorize,
+  validate(createTaskSchema), // ← Validation Zod
   createTask
 );
 
@@ -34,7 +37,7 @@ router.post(
 router.get(
   "/projects/:projectId/tasks",
   authenticate,
-  validate(listTasksQuerySchema),  // ← Validation Zod
+  validate(listTasksQuerySchema), // ← Validation Zod
   listTasks
 );
 
@@ -42,7 +45,7 @@ router.get(
 router.get(
   "/projects/:projectId/tasks/:taskId",
   authenticate,
-  validate(taskIdParamSchema),  // ← Validation Zod
+  validate(taskIdParamSchema), // ← Validation Zod
   getTask
 );
 
@@ -50,8 +53,8 @@ router.get(
 router.put(
   "/tasks/:taskId",
   authenticate,
-  authorize("ETUDIANT"),
-  validate(updateTaskSchema),  // ← Validation Zod
+  authorize,
+  validate(updateTaskSchema), // ← Validation Zod
   updateTask
 );
 
@@ -59,8 +62,8 @@ router.put(
 router.delete(
   "/tasks/:taskId",
   authenticate,
-  authorize("ETUDIANT"),
-  validate(taskIdParamSchema),  // ← Validation Zod
+  authorize,
+  validate(taskIdParamSchema), // ← Validation Zod
   deleteTask
 );
 
@@ -68,8 +71,8 @@ router.delete(
 router.patch(
   "/tasks/:taskId/status",
   authenticate,
-  authorize("ETUDIANT"),
-  validate(updateTaskStatusSchema),  // ← Validation Zod
+  authorize,
+  validate(updateTaskStatusSchema), // ← Validation Zod
   updateTaskStatus
 );
 
@@ -77,8 +80,8 @@ router.patch(
 router.get(
   "/tasks/:taskId/history",
   authenticate,
-  validate(taskIdParamSchema),  // ← Validation Zod
+  validate(taskIdParamSchema), // ← Validation Zod
   getTaskHistory
 );
 
-module.exports = router;
+export { router };

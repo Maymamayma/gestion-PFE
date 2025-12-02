@@ -1,16 +1,14 @@
 // src/routes/reportHistory.routes.js
-const express = require("express");
+import express from "express";
+
 const router = express.Router();
 
-const {
+import {
   listHistory,
   downloadReport,
-} = require("../controllers/reportHistory.controller");
+} from "../controllers/reportHistory.controller.js";
 
-// List all report versions for a project
 router.get("/projects/:projectId/reports", listHistory);
+router.get("/projects/:projectId/reports/:reportId/download", downloadReport);
 
-// Download a specific report version
-router.get("projects/:projectId/reports/:reportId/download", downloadReport);
-
-module.exports = router;
+export { router };

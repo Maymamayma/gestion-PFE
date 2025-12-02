@@ -1,21 +1,23 @@
-const express = require("express");
-const router = express.Router();
-const {
+import express from "express";
+import {
   validateTask,
-  getTaskValidations
-} = require("../controllers/validation.controller");
-const { authenticate, authorize } = require("../middleware/auth");
-const validate = require("../middleware/validate");
+  getTaskValidations,
+} from "../controllers/validation.controller.js";
+import {
+  loggedMiddleware as authenticate,
+  isStudent as authorize,
+} from "../middleware/auth.js";
+import { validate } from "../middleware/validate.js";
+import { validateTaskSchema } from "../validators/validation.validator.js";
+import { taskIdParamSchema } from "../validators/task.validator.js";
 
-// Import du schéma de validation
-const { validateTaskSchema } = require("../validators/validation.validator");
-const { taskIdParamSchema } = require("../validators/task.validator");
+const router = express.Router();
 
 // Valider une tâche (avec validation Zod)
 router.post(
   "/tasks/:taskId/validate",
   authenticate,
-  authorize(["ENCADRANT_ENTREPRISE", "ENCADRANT_UNIVERSITAIRE"]),
+  authorize,
   validate(validateTaskSchema),
   validateTask
 );
@@ -28,4 +30,4 @@ router.get(
   getTaskValidations
 );
 
-module.exports = router;
+export { router };

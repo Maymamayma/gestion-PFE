@@ -1,17 +1,17 @@
-const { ZodError } = require("zod");
+import { ZodError } from "zod";
 
 /**
  * Middleware de validation Zod
  * @param {ZodSchema} schema - Schéma Zod à valider
  */
-const validate = (schema) => {
+export const validate = (schema) => {
   return async (req, res, next) => {
     try {
       // Valider la requête (body, params, query)
       await schema.parseAsync({
         body: req.body,
         params: req.params,
-        query: req.query
+        query: req.query,
       });
 
       next();
@@ -20,22 +20,20 @@ const validate = (schema) => {
         // Formater les erreurs Zod
         const errors = error.errors.map((err) => ({
           field: err.path.join("."),
-          message: err.message
+          message: err.message,
         }));
 
         return res.status(400).json({
           error: "Validation échouée",
-          details: errors
+          details: errors,
         });
       }
 
       // Autres erreurs
       return res.status(500).json({
         error: "Erreur de validation",
-        message: error.message
+        message: error.message,
       });
     }
   };
 };
-
-module.exports = validate;

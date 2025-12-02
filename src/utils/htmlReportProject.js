@@ -1,23 +1,30 @@
-module.exports = {
-  generateProjectReportHTML: (project, sprints, allTasks, allHistory) => {
-    const totalTasks = allTasks.length;
-    const doneTasks = allTasks.filter(t => t.status === "Done").length;
-    const inProgressTasks = allTasks.filter(t => t.status === "InProgress").length;
-    const standbyTasks = allTasks.filter(t => t.status === "Standby").length;
-    const todoTasks = allTasks.filter(t => t.status === "ToDo").length;
-    const progressPercent = totalTasks > 0 ? ((doneTasks / totalTasks) * 100).toFixed(2) : 0;
+export const generateProjectReportHTML = (
+  project,
+  sprints,
+  allTasks,
+  allHistory
+) => {
+  const totalTasks = allTasks.length;
+  const doneTasks = allTasks.filter((t) => t.status === "Done").length;
+  const inProgressTasks = allTasks.filter(
+    (t) => t.status === "InProgress"
+  ).length;
+  const standbyTasks = allTasks.filter((t) => t.status === "Standby").length;
+  const todoTasks = allTasks.filter((t) => t.status === "ToDo").length;
+  const progressPercent =
+    totalTasks > 0 ? ((doneTasks / totalTasks) * 100).toFixed(2) : 0;
 
-    // Grouper les tâches par sprint
-    const tasksBySprint = {};
-    allTasks.forEach(task => {
-      const sprintId = task.sprintId?.toString() || "no-sprint";
-      if (!tasksBySprint[sprintId]) {
-        tasksBySprint[sprintId] = [];
-      }
-      tasksBySprint[sprintId].push(task);
-    });
+  // Grouper les tâches par sprint
+  const tasksBySprint = {};
+  allTasks.forEach((task) => {
+    const sprintId = task.sprintId?.toString() || "no-sprint";
+    if (!tasksBySprint[sprintId]) {
+      tasksBySprint[sprintId] = [];
+    }
+    tasksBySprint[sprintId].push(task);
+  });
 
-    return `
+  return `
       <!DOCTYPE html>
       <html lang="fr">
         <head>
@@ -90,11 +97,15 @@ module.exports = {
               <div class="progress-bar" style="width: ${progressPercent}%">${progressPercent}%</div>
             </div>
 
-            ${standbyTasks > 0 ? `
+            ${
+              standbyTasks > 0
+                ? `
             <div class="alert">
               <strong>⚠️ Attention :</strong> ${standbyTasks} tâche(s) bloquée(s) nécessite(nt) votre attention !
             </div>
-            ` : ''}
+            `
+                : ""
+            }
 
             <h2>📋 Toutes les Tâches du Projet</h2>
             <table>
@@ -108,15 +119,29 @@ module.exports = {
                 </tr>
               </thead>
               <tbody>
-                ${allTasks.length > 0 ? allTasks.map(t => `
+                ${
+                  allTasks.length > 0
+                    ? allTasks
+                        .map(
+                          (t) => `
                   <tr>
                     <td><strong>${t.title}</strong></td>
-                    <td>${t.description.substring(0, 80)}${t.description.length > 80 ? '...' : ''}</td>
-                    <td><span class="status status-${t.status.toLowerCase()}">${t.status}</span></td>
-                    <td><span class="priority priority-${t.priority.toLowerCase()}">${t.priority}</span></td>
+                    <td>${t.description.substring(0, 80)}${
+                            t.description.length > 80 ? "..." : ""
+                          }</td>
+                    <td><span class="status status-${t.status.toLowerCase()}">${
+                            t.status
+                          }</span></td>
+                    <td><span class="priority priority-${t.priority.toLowerCase()}">${
+                            t.priority
+                          }</span></td>
                     <td>${t.sprintId?.nom || t.sprintId || "N/A"}</td>
                   </tr>
-                `).join("") : '<tr><td colspan="5">Aucune tâche</td></tr>'}
+                `
+                        )
+                        .join("")
+                    : '<tr><td colspan="5">Aucune tâche</td></tr>'
+                }
               </tbody>
             </table>
 
@@ -133,26 +158,46 @@ module.exports = {
                 </tr>
               </thead>
               <tbody>
-                ${allHistory.length > 0 ? allHistory.slice(0, 50).map(h => `
+                ${
+                  allHistory.length > 0
+                    ? allHistory
+                        .slice(0, 50)
+                        .map(
+                          (h) => `
                   <tr>
                     <td>${h.taskId?.title || "N/A"}</td>
-                    <td><span class="status status-${h.oldStatus.toLowerCase()}">${h.oldStatus}</span></td>
-                    <td><span class="status status-${h.newStatus.toLowerCase()}">${h.newStatus}</span></td>
-                    <td>${new Date(h.changedAt).toLocaleString('fr-FR')}</td>
-                    <td>${h.changedBy?.user_name || h.changedBy?.email || "Inconnu"}</td>
+                    <td><span class="status status-${h.oldStatus.toLowerCase()}">${
+                            h.oldStatus
+                          }</span></td>
+                    <td><span class="status status-${h.newStatus.toLowerCase()}">${
+                            h.newStatus
+                          }</span></td>
+                    <td>${new Date(h.changedAt).toLocaleString("fr-FR")}</td>
+                    <td>${
+                      h.changedBy?.user_name || h.changedBy?.email || "Inconnu"
+                    }</td>
                     <td>${h.notes || "-"}</td>
                   </tr>
-                `).join("") : '<tr><td colspan="6">Aucun historique</td></tr>'}
+                `
+                        )
+                        .join("")
+                    : '<tr><td colspan="6">Aucun historique</td></tr>'
+                }
               </tbody>
             </table>
-            ${allHistory.length > 50 ? `<p style="text-align: center; color: #666; margin-top: 10px;">Affichage des 50 derniers changements (${allHistory.length} au total)</p>` : ''}
+            ${
+              allHistory.length > 50
+                ? `<p style="text-align: center; color: #666; margin-top: 10px;">Affichage des 50 derniers changements (${allHistory.length} au total)</p>`
+                : ""
+            }
 
             <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #888;">
-              <p>Rapport global généré le ${new Date().toLocaleString('fr-FR')}</p>
+              <p>Rapport global généré le ${new Date().toLocaleString(
+                "fr-FR"
+              )}</p>
             </footer>
           </div>
         </body>
       </html>
     `;
-  }
 };

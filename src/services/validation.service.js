@@ -1,11 +1,9 @@
-const Validation = require("../models/Validation.model");
+import { Validation } from "../models/Validation.model.js";
 
-module.exports = {
-  create: (data) => Validation.create(data),
+export const create = (data) => Validation.create(data);
 
-  listByTask: (taskId) =>
-    Validation.find({ taskId }).populate("validatedBy", "user_name email"),
+export const listByTask = (taskId) =>
+  Validation.find({ taskId }).populate("validatedBy", "user_name email");
 
-  listByReunion: (reunionId) =>
-    Validation.find({ reunionId }).populate("validatedBy", "user_name email"),
-};
+export const listByReunion = (reunionId) =>
+  Validation.find({ reunionId }).populate("validatedBy", "user_name email");
