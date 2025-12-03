@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { Project } from "../models/project.model.js";
+import { generateDashboard } from "../services/project.service.js";
 //---------------------------------------DONE-----------------------
 // Get all projects
 export const fetchAllProjects = async (req, res) => {
@@ -145,3 +146,22 @@ export const deleteProject = async (req, res) => {
 };
 
 //---------------------------------------DONE-----------------------
+
+export const getProjectDashboard = async (req, res) => {
+  try {
+    const projectId = req.params.id;
+
+    const dashboard = await generateDashboard(projectId);
+
+    return res.status(200).json({
+      success: true,
+      data: dashboard,
+    });
+  } catch (error) {
+    console.error("Dashboard error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Dashboard error.",
+    });
+  }
+};

@@ -1,4 +1,4 @@
-import { Task } from "../models/Task.model.js";
+import { Task } from "../models/task.model.js";
 
 export const TaskService = {
   create: (data) => Task.create(data),

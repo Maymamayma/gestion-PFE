@@ -5,10 +5,11 @@ import {
   fetchProjectById,
   deleteProject,
   updateProject,
+  getProjectDashboard,
 } from "../controllers/project.controller.js";
 
 const router = express.Router();
-
+router.get("/:id/dashboard", getProjectDashboard);
 router.post("/", createProject);
 router.get("/", fetchAllProjects);
 router.get("/:id", fetchProjectById);
