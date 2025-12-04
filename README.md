@@ -28,14 +28,39 @@ Ce travail inclut notamment (exemples des commits) :
 
 ---
 
-##  **Groupe C — Malek Fitou & Alleddine Guidar**
+##  **Groupe C — Malek Fitouri & Ala Eddine Guidara**
 
 ### **Work Distribution**
 
 
-* …
-* …
+L’équipe a travaillé conjointement sur la majorité des fonctionnalités (endpoints, modèles, intégration générale).
+Pour une meilleure répartition, voici les responsabilités principales :
 
+* **Ala Eddine Guidara**
+
+Mise en place des validations avec Zod.
+
+Participation au développement des endpoints (Task, User Story, Report, History).
+
+Corrections backend & organisation du code.
+
+* **Malek Fitouri**
+
+Documentation API avec Swagger.
+
+Contribution au développement des endpoints (Task, Sprint report, Project report).
+
+Structuration et nettoyage des routes + fixes d’intégration.
+
+Travail collaboratif (les deux)
+
+Tests des endpoints.
+
+Vérification de la cohérence des modules (tasks, reports, sprint history).
+
+Débogage & ajustements finaux avant merge.
+
+* 'Note : Les commits apparaissent depuis une seule machine, mais le travail a été réalisé en binôme de manière coordonnée.'
 ---
 
 ##  **Groupe D — Khair Hammai & Aymen Settey**
