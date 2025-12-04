@@ -1,6 +1,6 @@
 import { create } from "../services/validation.service.js";
 
-import { Task } from "../models/Task.model.js";
+import { Task } from "../models/task.model.js";
 
 export const validateTask = async (req, res) => {
   try {
