@@ -1,5 +1,5 @@
-import { Project } from "../models/project.model.js";
-import { Sprint } from "../models/sprint.model.js";
+import { Project } from "../models/Project.model.js";
+import { Sprint } from "../models/Sprint.model.js";
 import { Task } from "../models/task.model.js";
 import { Validation } from "../models/validation.model.js";
 import { Meeting } from "../models/meeting.model.js";
