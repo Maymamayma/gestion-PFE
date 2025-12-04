@@ -1,43 +1,56 @@
 import { Sprint } from "../models/Sprint.model.js";
 import { Project } from "../models/Project.model.js";
+// --------------------------DONE-------------------------
 
 // Create a new sprint
 export const createSprint = async (req, res) => {
   try {
     const { projectId } = req.params;
-    const { number, name, start_date, end_date, status } = req.body;
+    const { number, title, start_date, end_date, status } = req.body;
 
-    // Check if project exists
-    const project = await Project.fetchProjectById(projectId);
+    // 1. Check if project exists
+    const project = await Project.findById(projectId);
     if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
 
-    // Create sprint
+    // 2. Check if sprint number already exists for this project
+    const existingSprint = await Sprint.findOne({
+      project_id: projectId,
+      number,
+    });
+
+    if (existingSprint) {
+      return res.status(400).json({
+        error: `Sprint number ${number} already exists in this project.`,
+      });
+    }
+
+    // 3. Create new sprint
     const sprint = await Sprint.create({
       project_id: projectId,
       number,
-      name,
+      title,
       start_date,
       end_date,
       status,
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Sprint created successfully",
       sprint,
     });
   } catch (error) {
     console.error("Error creating sprint:", error);
 
-    // Handle unique validation error
+    // Handle unique index error
     if (error.code === 11000) {
       return res.status(400).json({
         error: "Sprint number must be unique within the same project.",
       });
     }
 
-    res.status(500).json({ error: "Server error" });
+    return res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -47,11 +60,11 @@ export const getProjectSprints = async (req, res) => {
     const { projectId } = req.params;
 
     // Check if project exists
-    const project = await Project.fetchProjectById(projectId);
+    const project = await Project.findById(projectId);
     if (!project) {
       return res.status(404).json({ error: "Project not found" });
     }
-    
+
     const sprints = await Sprint.find({ project_id: projectId }).sort("number");
 
     res.status(200).json(sprints);
@@ -127,3 +140,5 @@ export const deleteSprint = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+// --------------------------DONE-------------------------

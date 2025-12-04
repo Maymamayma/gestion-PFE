@@ -14,7 +14,7 @@ const SprintSchema = new mongoose.Schema(
       min: [1, "Sprint number must be at least 1"],
     },
 
-    name: {
+    title: {
       type: String,
       required: [true, "Sprint name is required"],
       minlength: [3, "Sprint name must be at least 3 characters"],
@@ -55,7 +55,10 @@ const SprintSchema = new mongoose.Schema(
 // project_id + number must be unique
 SprintSchema.index(
   { project_id: 1, number: 1 },
-  { unique: true, message: "Sprint number must be unique within the same project" }
+  {
+    unique: true,
+    message: "Sprint number must be unique within the same project",
+  }
 );
 
 export const Sprint = mongoose.model("Sprint", SprintSchema);

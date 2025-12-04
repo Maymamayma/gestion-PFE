@@ -6,21 +6,24 @@ import {
   updateSprint,
   deleteSprint,
 } from "../controllers/sprint.controller.js";
-import { isStudent, loggedMiddleware } from "../middlewares/auth.js";
+import { isStudent, loggedMiddleware } from "../middleware/auth.js";
 
 export const router = express.Router();
 
 // Create sprint
-router.post("/projects/:projectId/sprints",loggedMiddleware ,isStudent , createSprint);
+//TODO : add isStudent later
+router.post("/projects/:projectId/sprints", createSprint);
 
 // List all sprints of a project
-router.get("/projects/:projectId/sprints",loggedMiddleware , getProjectSprints);
+router.get("/projects/:projectId/sprints", getProjectSprints);
 
 // Get sprint by ID
-router.get("/sprints/:sprintId",loggedMiddleware , getSprintById);
+router.get("/sprints/:sprintId", getSprintById);
 
 // Update sprint
-router.put("/sprints/:sprintId",loggedMiddleware ,isStudent , updateSprint);
+router.put("/sprints/:sprintId", updateSprint);
 
 // Delete sprint
-router.delete("/sprints/:sprintId",loggedMiddleware ,isStudent , deleteSprint);
+router.delete("/sprints/:sprintId", deleteSprint);
+
+export default router;
