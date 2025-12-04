@@ -29,6 +29,8 @@ app.use("/api/sprint-reports", sprintReportRouter);
 app.use("/api/tasks", taskRouter);
 app.use("/api/user-stories", userStoryRouter);
 app.use("/api/validations", validationRouter);
+app.use("/api/projects", projectRoutes);
+app.use("/api/sprints", projectRoutes);
 
 //routes project (abir touch it and i ll kill u )
 app.use("/projects", projectRoutes);

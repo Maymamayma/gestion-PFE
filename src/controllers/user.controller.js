@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User } from "../models/User.model.js";
+
 export const signup = async (req, res) => {
   try {
     //vérifier si l'email existe ou non
@@ -34,6 +35,7 @@ export const signup = async (req, res) => {
     res.status(500).json({ message: e.message });
   }
 };
+
 export const login = async (req, res) => {
   try {
     //récuperer le user qui a l'email donné par le body
