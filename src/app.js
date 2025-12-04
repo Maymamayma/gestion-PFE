@@ -1,5 +1,10 @@
 import express from "express";
 import cors from "cors";
+import swaggerJsdoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
+import { globSync } from 'glob';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 
 import { router as userRouter } from "./routes/user.routes.js";
 import { router as projectReportRouter } from "./routes/projectReport.routes.js";
@@ -32,6 +37,42 @@ app.use("/api/validations", validationRouter);
 
 //routes project (abir touch it and i ll kill u )
 app.use("/projects", projectRoutes);
+
+// Fix ESM : Obtenir __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Glob les fichiers routes
+const apiFiles = globSync('./routes/*.routes.js', { cwd: __dirname });
+
+// Configuration Swagger
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "API Gestion de Projets",
+      version: "1.0.0",
+      description: "Documentation automatique de l'API backend Node.js avec Swagger.",
+    },
+    servers: [
+      {
+        url: "http://localhost:5000",
+        description: "Serveur de développement",
+      },
+    ],
+  },
+  apis: apiFiles.map(file => join(__dirname, file)), // Chemins absolus pour un parsing fiable
+};
+
+const specs = swaggerJsdoc(options);
+
+// Route pour Swagger UI
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+
+// Redirection racine vers docs
+app.get("/", (req, res) => {
+  res.redirect("/api-docs");
+});
 
 // Route 404
 app.use((req, res) => {
