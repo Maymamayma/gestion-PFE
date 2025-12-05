@@ -63,13 +63,84 @@ Débogage & ajustements finaux avant merge.
 * 'Note : Les commits apparaissent depuis une seule machine, mais le travail a été réalisé en binôme de manière coordonnée.'
 ---
 
-##  **Groupe D — Khair Hammai & Aymen Settey**
+##  **Groupe D — Khairi Hammami & Aymen Settey**
 
 ### **Work Distribution**
 
+L'équipe D a implémenté le module **Validations & Réunions** du système de gestion de PFE.
 
-* …
-* …
+#### **Répartition des tâches**
+
+* **Aymen Settey** : 
+  - Développement du système de réunions (Meeting model, service, controller)
+  - Implémentation des endpoints CRUD pour les réunions
+  - Système de validation du contenu des réunions par l'encadrant universitaire
+  - Documentation Swagger pour les endpoints de réunions
+
+* **Khairi Hammami** :
+  - Amélioration du système de validation existant
+  - Intégration des références de réunions dans les validations
+  - Développement des endpoints de validation liés aux réunions
+  - Création de la collection Postman pour les tests
+
+#### **Fonctionnalités implémentées**
+
+**1. Gestion des Réunions (Meetings)**
+- Création de réunions avec ordre du jour (agenda)
+- Mise à jour des réunions non complétées
+- Complétion des réunions avec compte rendu réel (actualReport)
+- Validation du contenu des réunions par l'encadrant universitaire
+- Système de références : une réunion peut référencer une User Story, Task, ou Report
+- Filtrage des réunions (à venir, complétées, par projet)
+- Suppression de réunions
+
+**2. Système de Validation Amélioré**
+- Validation de tâches avec référence optionnelle à une réunion
+- Support "hors réunion" (meetingId = null)
+- Récupération des validations par tâche
+- Récupération des validations par réunion
+- Horodatage et traçabilité complète
+
+**3. Endpoints API développés**
+
+*Réunions:*
+- `POST /api/meetings` - Créer une réunion (Étudiant)
+- `GET /api/meetings` - Lister toutes les réunions
+- `GET /api/meetings/upcoming` - Réunions à venir
+- `GET /api/meetings/completed` - Réunions complétées
+- `GET /api/meetings/:id` - Détails d'une réunion
+- `PUT /api/meetings/:id` - Modifier une réunion (Étudiant)
+- `POST /api/meetings/:id/complete` - Compléter une réunion (Étudiant)
+- `POST /api/meetings/:id/validate` - Valider le contenu (Encadrant universitaire)
+- `DELETE /api/meetings/:id` - Supprimer une réunion (Étudiant)
+
+*Validations:*
+- `POST /api/validations/tasks/:taskId/validate` - Valider une tâche (Encadrants)
+- `GET /api/validations/tasks/:taskId/validations` - Validations d'une tâche
+- `GET /api/validations/meetings/:meetingId/validations` - Validations d'une réunion
+
+**4. Modèles de données**
+
+*Meeting Model:*
+- projectId, plannedDate, agenda, actualReport
+- isCompleted, referenceType, referenceId
+- isValidated, validatedBy, validatedAt, validationComment
+- createdBy, timestamps
+
+*Validation Model (amélioré):*
+- taskId, isValid, comment, validatedBy, validatedAt
+- meetingId (optionnel), typeValidation
+
+**5. Contrôle d'accès (RBAC)**
+- Étudiant : création, modification, complétion, suppression de réunions
+- Encadrant entreprise : validation de tâches
+- Encadrant universitaire : validation de tâches + validation du contenu des réunions
+
+**6. Documentation et Tests**
+- Documentation Swagger complète pour tous les endpoints
+- Collection Postman avec scénarios de test complets
+- Validation Zod pour toutes les entrées
+- Gestion d'erreurs robuste
 
 ---
 

@@ -1,44 +1,65 @@
 import mongoose from "mongoose";
 
-const meetingSchema = new mongoose.Schema(
+const reunionSchema = new mongoose.Schema(
   {
-    project_id: {
+    projectId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Project",
       required: true,
     },
 
-    type: {
-      type: String,
-      enum: [
-        "Daily",
-        "Planning",
-        "Review",
-        "Retrospective",
-        "Sprint Review",
-        "Other",
-      ],
-      default: "Other",
-    },
-
-    date: {
+    datePlanification: {
       type: Date,
       required: true,
     },
 
-    attendees: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Student",
-      },
-    ],
-
-    notes: {
+    ordreDuJour: {
       type: String,
+      required: true,
+      minlength: 10,
+      maxlength: 2000,
+    },
+
+    compteRendu: {
+      type: String,
+      maxlength: 5000,
       default: "",
+    },
+
+    statut: {
+      type: String,
+      enum: ["Planifiee", "Effectuee", "Annulee"],
+      default: "Planifiee",
+    },
+
+    // Team D enhancement: reference to UserStory, Task, or Report
+    referenceType: {
+      type: String,
+      enum: ["UserStory", "Task", "Report", null],
+      default: null,
+    },
+
+    referenceId: {
+      type: mongoose.Schema.Types.ObjectId,
+      refPath: "referenceType",
+      default: null,
+    },
+
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
+    dateCreation: {
+      type: Date,
+      default: Date.now,
     },
   },
   { timestamps: true }
 );
 
-export const Meeting = mongoose.model("Meeting", meetingSchema);
+export const Reunion = mongoose.model("Reunion", reunionSchema);
+// Keep Meeting export for backward compatibility
+export const Meeting = Reunion;
+
