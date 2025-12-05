@@ -39,9 +39,13 @@ export const getUserStory = async (req, res) => {
 };
 export const updateUserStory = async (req, res) => {
   try {
-    const { userStoryId } = req.params;
+    const { projectId,sprintId,userStoryId } = req.params;
 
-    const updated = await UserStoryService.update(userStoryId, req.body);
+    const updated = await UserStoryService.update(
+      userStoryId,
+      projectId,
+      sprintId,
+      req.body);
 
     if (!updated)
       return res.status(404).json({ error: "User story not found" });
@@ -53,9 +57,13 @@ export const updateUserStory = async (req, res) => {
 };
 export const deleteUserStory = async (req, res) => {
   try {
-    const { userStoryId } = req.params;
+    const { projectId, sprintId, userStoryId } = req.params;
 
-    const deleted = await UserStoryService.delete(userStoryId);
+    const deleted = await UserStoryService.remove(
+      userStoryId,
+      projectId,
+      sprintId
+    );
 
     if (!deleted)
       return res.status(404).json({ error: "User story not found" });
