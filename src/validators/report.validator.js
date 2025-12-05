@@ -12,10 +12,10 @@ export const reportParamsSchema = z.object({
   }),
 });
 
-// Schema to validate the request body for uploading a new report version. validates and transforms data to the correct types.
+// Schema to validate the request body for uploading a new report version. It validates and transforms data to the correct types.
  
 export const uploadReportBodySchema = z.object({
-  // date of report version expects string and parses it into a valid date object 
+  // date of report version expects string and parses it into a valid date object then a js date object 
   date: z.string().transform((val, ctx) => {
     const date = new Date(val);
     if (isNaN(date.getTime())) {
@@ -28,7 +28,7 @@ export const uploadReportBodySchema = z.object({
     return date; // Return the transformed Date object.
   }),
 
-  // Version num is mandatory.
+  // Version num is mandatory
    
   version: z.string({ required_error: "Version number is required." })
              .min(1, "Version number cannot be empty."),

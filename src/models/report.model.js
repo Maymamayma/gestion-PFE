@@ -10,7 +10,7 @@ const ReportSchema = new mongoose.Schema({
 
   fileName: { type: String, required: true },
   filePath: { type: String, required: true },
-
+  // updated into string 
   version: { type: string, required: true},
 
   notes: {
