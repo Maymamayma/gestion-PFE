@@ -2,16 +2,16 @@ import express from "express";
 import cors from "cors";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
-import { globSync } from 'glob';
-import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
+import { globSync } from "glob";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 
 import { router as projectReportRouter } from "./routes/projectReport.routes.js";
 import { router as reportRouter } from "./routes/report.routes.js";
 import { router as reportHistoryRouter } from "./routes/reportHistory.routes.js";
 import { router as sprintReportRouter } from "./routes/sprintReport.routes.js";
 import { router as taskRouter } from "./routes/task.routes.js";
-import { router as userStoryRouter } from "./routes/userstory.routes.js";
+//import { router as userStoryRouter } from "./routes/userstory.routes.js";
 import { router as validationRouter } from "./routes/validation.routes.js";
 import projectRoutes from "./routes/project.routes.js";
 import sprinRoutes from "./routes/sprint.routes.js";
@@ -32,7 +32,7 @@ app.use("/api/reports", reportRouter);
 app.use("/api/report-histories", reportHistoryRouter);
 app.use("/api/sprint-reports", sprintReportRouter);
 app.use("/api/tasks", taskRouter);
-app.use("/api/user-stories", userStoryRouter);
+//app.use("/api/user-stories", userStoryRouter);
 app.use("/api/validations", validationRouter);
 app.use("/api/sprints", sprinRoutes);
 
@@ -47,7 +47,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Glob les fichiers routes
-const apiFiles = globSync('./routes/*.routes.js', { cwd: __dirname });
+const apiFiles = globSync("./routes/*.routes.js", { cwd: __dirname });
 
 // Configuration Swagger
 const options = {
@@ -56,7 +56,8 @@ const options = {
     info: {
       title: "API Gestion de Projets",
       version: "1.0.0",
-      description: "Documentation automatique de l'API backend Node.js avec Swagger.",
+      description:
+        "Documentation automatique de l'API backend Node.js avec Swagger.",
     },
     servers: [
       {
@@ -65,7 +66,7 @@ const options = {
       },
     ],
   },
-  apis: apiFiles.map(file => join(__dirname, file)), // Chemins absolus pour un parsing fiable
+  apis: apiFiles.map((file) => join(__dirname, file)), // Chemins absolus pour un parsing fiable
 };
 
 const specs = swaggerJsdoc(options);

@@ -1,11 +1,9 @@
 import express from "express";
 import upload from "../middleware/uploadReport.js";
 import { uploadReportVersion } from "../controllers/report.controller.js";
-import {
-  loggedMiddleware as authenticate,
-  isStudent,
-} from "../middleware/auth.js";
+import { loggedMiddleware as authenticate } from "../middleware/auth.js";
 
+import { requireRole } from "../middleware/roles.js";
 const router = express.Router();
 
 /**
@@ -76,7 +74,7 @@ const router = express.Router();
 router.post(
   "/projects/:projectId/reports/upload",
   authenticate,
-  isStudent,
+  requireRole("etudiant"),
   upload.single("pdf"),
   uploadReportVersion
 );
