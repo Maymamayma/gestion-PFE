@@ -135,7 +135,7 @@ export const generateProjectReportHTML = (
                     <td><span class="priority priority-${t.priority.toLowerCase()}">${
                             t.priority
                           }</span></td>
-                    <td>${t.sprintId?.nom || t.sprintId || "N/A"}</td>
+                    <td>${t.sprintId?.title || t.sprintId?.number || "N/A"}</td>
                   </tr>
                 `
                         )
