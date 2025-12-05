@@ -24,33 +24,18 @@ const ProjectSchema = new mongoose.Schema(
       type: [
         {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
+          ref: "Student", //hethi model ta3 user we ll do it later
         },
       ],
       validate: [
         {
           validator: function (value) {
-            return value.length <= 2;
+            return value.length <= 2; // max 2 students
           },
-          message: "A project can have a maximum of 2 students.",
+          message: "Un projet peut avoir au maximum 2 étudiants.",
         },
       ],
-      required: true, // At least 1 student required
-    },
-
-    student_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
-
-    company_supervisor_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
-
-    university_supervisor_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      required: true, // atleast 1
     },
   },
   {

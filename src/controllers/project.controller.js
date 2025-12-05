@@ -1,46 +1,43 @@
 import mongoose from "mongoose";
-import { Project } from "../models/project.model.js";
+import { Project } from "../models/Project.model.js";
 import { generateDashboard } from "../services/project.service.js";
 //---------------------------------------DONE-----------------------
 // Get all projects
 export const fetchAllProjects = async (req, res) => {
   try {
+    const userId = req.user._id;
+    const role = req.user.role;
+
     let query = {};
-    //always do this why cuz java lay3itni
-    const toObjectId = (id) => new mongoose.Types.ObjectId(id);
-    const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
-    if (
-      req.query.student_id &&
-      req.query.student_id !== "" &&
-      isValidObjectId(req.query.student_id)
-    ) {
-      query.student_id = toObjectId(req.query.student_id);
+    // Student → get projects where he is in students array
+    if (role === "etudiant") {
+      query.students = userId;
     }
 
-    if (
-      req.query.company_supervisor_id &&
-      req.query.company_supervisor_id !== "" &&
-      isValidObjectId(req.query.company_supervisor_id)
-    ) {
-      query.company_supervisor_id = toObjectId(req.query.company_supervisor_id);
+    // University supervisor
+    if (role === "encad_universitaire") {
+      query.university_supervisor_id = userId;
     }
 
-    if (
-      req.query.university_supervisor_id &&
-      req.query.university_supervisor_id !== "" &&
-      isValidObjectId(req.query.university_supervisor_id)
-    ) {
-      query.university_supervisor_id = toObjectId(
-        req.query.university_supervisor_id
-      );
+    // Company supervisor
+    if (role === "encad_entreprise") {
+      query.company_supervisor_id = userId;
     }
 
     const projects = await Project.find(query)
-      .populate("student_id", "name email role")
+      .populate("students", "name email role")
       .populate("company_supervisor_id", "name email role")
       .populate("university_supervisor_id", "name email role")
       .sort({ createdAt: -1 });
+
+    if (projects.length === 0) {
+      return res.status(200).json({
+        count: 0,
+        message: "No projects found",
+        projects: [],
+      });
+    }
 
     res.json({
       count: projects.length,

@@ -1,55 +1,62 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import validator from "validator";
 
-const userSchema = new mongoose.Schema(
-  {
-    email: {
-      type: String,
-      required: [true, "L'email est obligatoire"],
-      unique: true,
-      lowercase: true,
-      trim: true,
-      match: [
-        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-        "Email invalide",
-      ],
+const userSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true,
+    validate: {
+      validator: validator.isEmail,
+      message: "Invalid email format",
     },
+  },
 
-    password: {
-      type: String,
-      required: [true, "Le mot de passe est obligatoire"],
-      minlength: [6, "Le mot de passe doit contenir au moins 6 caractères"],
-    },
+  password: {
+    type: String,
+    required: true,
+    minlength: 6,
+  },
 
-    name: {
-      type: String,
-      required: [true, "Le nom est obligatoire"],
-      minlength: [3, "Le nom doit contenir au moins 3 caractères"],
-      maxlength: [50, "Le nom ne peut pas dépasser 50 caractères"],
-      trim: true,
-    },
+  name: {
+    type: String,
+    required: true,
+    minlength: 3,
+    maxlength: 50,
+    trim: true,
+  },
 
-    role: {
-      type: String,
-      enum: ["etudiant", "encad_universitaire", "encad_entreprise"],
-      default: "etudiant",
-    },
+  role: {
+    type: String,
+    enum: ["etudiant", "encad_universitaire", "encad_entreprise"],
+    default: "etudiant",
+  },
 
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 
-    updatedAt: {
-      type: Date,
-      default: Date.now,
-    },
-  }
-);
-
-// pour mettre à jour updatedAt automatiquement
-userSchema.pre("save", function (next) {
-  this.updatedAt = Date.now();
-  next();
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
+
+// Hash password before saving
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  this.password = await bcrypt.hash(this.password, 10);
+  this.updatedAt = Date.now();
+});
+
+// Compare password method
+userSchema.methods.comparePassword = async function (password) {
+  return bcrypt.compare(password, this.password);
+};
 
 export const User = mongoose.model("User", userSchema);

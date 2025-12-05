@@ -3,15 +3,12 @@ import {
   validateTask,
   getTaskValidations,
 } from "../controllers/validation.controller.js";
-import {
-  loggedMiddleware as authenticate,
-  isCompanySupervisor,
-  isUniversitySupervisor,
-} from "../middleware/auth.js";
+import { loggedMiddleware as authenticate } from "../middleware/auth.js";
+
 import { validate } from "../middleware/validate.js";
 import { validateTaskSchema } from "../validators/validation.validator.js";
 import { taskIdParamSchema } from "../validators/task.validator.js";
-
+import { requireRole } from "../middleware/roles.js";
 const router = express.Router();
 
 // Middleware personnalisé : Encadrants seulement (entreprise OU universitaire)
@@ -24,8 +21,8 @@ const isSupervisor = (req, res, next) => {
   if (role === "encad_entreprise" || role === "encad_universitaire") {
     next();
   } else {
-    return res.status(403).json({ 
-      error: "Accès interdit. Seuls les encadrants peuvent valider les tâches." 
+    return res.status(403).json({
+      error: "Accès interdit. Seuls les encadrants peuvent valider les tâches.",
     });
   }
 };
@@ -82,7 +79,8 @@ const isSupervisor = (req, res, next) => {
 router.post(
   "/tasks/:taskId/validate",
   authenticate,
-  isSupervisor,
+  requireRole("encad_entreprise", "encad_universitaire"),
+
   validate(validateTaskSchema),
   validateTask
 );
