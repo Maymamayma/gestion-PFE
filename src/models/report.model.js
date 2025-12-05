@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { string } from "zod";
 const ReportSchema = new mongoose.Schema({
   projectId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -9,8 +10,14 @@ const ReportSchema = new mongoose.Schema({
 
   fileName: { type: String, required: true },
   filePath: { type: String, required: true },
+  // updated into string 
+  version: { type: string, required: true},
 
-  version: { type: Number, required: true, default: 1 },
+  notes: {
+    type: String,
+    trim: true, // trim to take off useless white spaces 
+    default: "", 
+  },
 
   createdAt: { type: Date, default: Date.now },
 });
