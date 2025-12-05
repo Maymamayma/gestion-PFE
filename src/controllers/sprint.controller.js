@@ -1,5 +1,8 @@
 import { Sprint } from "../models/Sprint.model.js";
 import { Project } from "../models/Project.model.js";
+import { UserStory } from "../models/UserStory.model.js";
+import { Task } from "../models/task.model.js";
+
 // --------------------------DONE-------------------------
 
 // Create a new sprint
@@ -142,3 +145,49 @@ export const deleteSprint = async (req, res) => {
 };
 
 // --------------------------DONE-------------------------
+
+export const getSprintDashboard = async (req, res) => {
+  try {
+    const { sprintId } = req.params;
+
+    // 1. Vérifier que le sprint existe
+    const sprint = await Sprint.findById(sprintId);
+    if (!sprint) return res.status(404).json({ error: "Sprint not found" });
+
+    // 2. Récupérer user stories du sprint
+    const userStories = await UserStory.find({ sprint: sprintId });
+
+    // 3. Récupérer toutes les tâches du sprint
+    const tasks = await Task.find({ sprint: sprintId });
+
+    // 4. Compter par statut
+    const totalTasks = tasks.length;
+    const todo = tasks.filter((t) => t.status === "ToDo").length;
+    const inProgress = tasks.filter((t) => t.status === "InProgress").length;
+    const standby = tasks.filter((t) => t.status === "Standby").length;
+    const done = tasks.filter((t) => t.status === "Done").length;
+
+    // 5. % d’avance
+    const progress =
+      totalTasks === 0 ? 0 : Math.round((done / totalTasks) * 100);
+
+    // 6. Préparer le dashboard
+    const dashboard = {
+      sprintId,
+      sprintName: sprint.name,
+      totalUserStories: userStories.length,
+      totalTasks,
+      taskStatus: {
+        ToDo: todo,
+        InProgress: inProgress,
+        Standby: standby,
+        Done: done,
+      },
+      progressPercentage: progress,
+    };
+
+    res.json(dashboard);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

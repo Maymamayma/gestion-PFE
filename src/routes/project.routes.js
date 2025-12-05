@@ -10,6 +10,11 @@ import {
   getProjectDashboard,
 } from "../controllers/project.controller.js";
 
+import {
+  createSprint,
+  getProjectSprints,
+} from "../controllers/sprint.controller.js";
+
 const router = express.Router();
 router.get(
   "/:id/dashboard",
@@ -32,4 +37,17 @@ router.get(
 );
 router.put("/:id", loggedMiddleware, requireRole("etudiant"), updateProject);
 router.delete("/:id", loggedMiddleware, requireRole("etudiant"), deleteProject);
+
+//---------------------------sprint ---------------------------
+// Create sprint
+router.post(
+  "/:id/sprints",
+  loggedMiddleware,
+  requireRole("etudiant"),
+  createSprint
+);
+
+// List all sprints of a project
+router.get("/:id/sprints", loggedMiddleware, getProjectSprints);
+
 export default router;

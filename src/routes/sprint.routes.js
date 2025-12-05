@@ -1,29 +1,28 @@
 import express from "express";
+import { loggedMiddleware } from "../middleware/auth.js";
+import { requireRole } from "../middleware/roles.js";
 import {
-  createSprint,
-  getProjectSprints,
   getSprintById,
   updateSprint,
   deleteSprint,
+  getSprintDashboard,
 } from "../controllers/sprint.controller.js";
-import { loggedMiddleware } from "../middleware/auth.js";
-import { requireRole } from "../middleware/roles.js";
 const router = express.Router();
 
-// Create sprint
-//TODO : add isStudent later
-router.post("/projects/:projectId/sprints", createSprint);
-
-// List all sprints of a project
-router.get("/projects/:projectId/sprints", getProjectSprints);
-
 // Get sprint by ID
-router.get("/sprints/:sprintId", getSprintById);
+router.get("/:sprintId", loggedMiddleware, getSprintById);
 
 // Update sprint
-router.put("/sprints/:sprintId", updateSprint);
+router.put("/:sprintId", loggedMiddleware, updateSprint);
 
 // Delete sprint
-router.delete("/sprints/:sprintId", deleteSprint);
+router.delete("/:sprintId", loggedMiddleware, deleteSprint);
+
+router.get(
+  "/:sprintId/dashboard",
+  loggedMiddleware,
+  requireRole("etudiant", "encad_universitaire", "encad_entreprise"),
+  getSprintDashboard
+);
 
 export default router;
