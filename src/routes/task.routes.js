@@ -9,10 +9,8 @@ import {
   updateTaskStatus,
   getTaskHistory,
 } from "../controllers/task.controller.js";
-import {
-  loggedMiddleware as authenticate,
-  isStudent as authorize,
-} from "../middleware/auth.js";
+import { loggedMiddleware as authenticate } from "../middleware/auth.js";
+import { requireRole } from "../middleware/roles.js";
 import { validate } from "../middleware/validate.js";
 
 // Import des schémas de validation
@@ -28,7 +26,7 @@ import { updateTaskStatusSchema } from "../validators/taskStatus.validator.js";
 router.post(
   "/projects/:projectId/sprints/:sprintId/userStories/:userStoryId/tasks",
   authenticate,
-  authorize,
+  requireRole("etudiant"),
   validate(createTaskSchema), // ← Validation Zod
   createTask
 );
@@ -53,7 +51,8 @@ router.get(
 router.put(
   "/tasks/:taskId",
   authenticate,
-  authorize,
+  requireRole("etudiant"),
+
   validate(updateTaskSchema), // ← Validation Zod
   updateTask
 );
@@ -62,7 +61,8 @@ router.put(
 router.delete(
   "/tasks/:taskId",
   authenticate,
-  authorize,
+  requireRole("etudiant"),
+
   validate(taskIdParamSchema), // ← Validation Zod
   deleteTask
 );
@@ -71,7 +71,8 @@ router.delete(
 router.patch(
   "/tasks/:taskId/status",
   authenticate,
-  authorize,
+  requireRole("etudiant"),
+
   validate(updateTaskStatusSchema), // ← Validation Zod
   updateTaskStatus
 );

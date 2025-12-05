@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 
-import { router as userRouter } from "./routes/user.routes.js";
 import { router as projectReportRouter } from "./routes/projectReport.routes.js";
 import { router as reportRouter } from "./routes/report.routes.js";
 import { router as reportHistoryRouter } from "./routes/reportHistory.routes.js";
@@ -12,6 +11,7 @@ import { router as validationRouter } from "./routes/validation.routes.js";
 import projectRoutes from "./routes/project.routes.js";
 import sprinRoutes from "./routes/sprint.routes.js";
 
+import authRoutes from "./routes/auth.routes.js";
 import errorHandler from "./middleware/errorHandler.js";
 
 const app = express();
@@ -22,7 +22,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use("/api/auth", userRouter);
 app.use("/api/project-reports", projectReportRouter);
 app.use("/api/reports", reportRouter);
 app.use("/api/report-histories", reportHistoryRouter);
@@ -30,11 +29,13 @@ app.use("/api/sprint-reports", sprintReportRouter);
 app.use("/api/tasks", taskRouter);
 app.use("/api/user-stories", userStoryRouter);
 app.use("/api/validations", validationRouter);
-app.use("/api/projects", projectRoutes);
-app.use("/", sprinRoutes);
+app.use("/api/sprints", sprinRoutes);
+
+//el auth
+app.use("/api/auth", authRoutes);
 
 //routes project (abir touch it and i ll kill u )
-app.use("/projects", projectRoutes);
+app.use("/api/projects", projectRoutes);
 
 // Route 404
 app.use((req, res) => {

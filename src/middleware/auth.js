@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { User } from "../models/User.model.js";
+import { User } from "../models/user.model.js";
 
 // Middleware to check token and set req.auth
 export const loggedMiddleware = async (req, res, next) => {

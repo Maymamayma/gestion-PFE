@@ -1,6 +1,6 @@
 import express from "express";
-import { loggedMiddleware } from "../middlewares/auth.js";
-import { requireRole } from "../middlewares/roles.js";
+import { loggedMiddleware } from "../middleware/auth.js";
+import { requireRole } from "../middleware/roles.js";
 import {
   createProject,
   fetchAllProjects,

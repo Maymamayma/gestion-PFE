@@ -6,9 +6,9 @@ import {
   updateSprint,
   deleteSprint,
 } from "../controllers/sprint.controller.js";
-import { isStudent, loggedMiddleware } from "../middleware/auth.js";
-
-export const router = express.Router();
+import { loggedMiddleware } from "../middleware/auth.js";
+import { requireRole } from "../middleware/roles.js";
+const router = express.Router();
 
 // Create sprint
 //TODO : add isStudent later
