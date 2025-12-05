@@ -1,51 +1,56 @@
 import mongoose from "mongoose";
 
-const projectSchema = new mongoose.Schema(
+const ProjectSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true, "Project title is required"],
-      trim: true,
-      minlength: [3, "Title must be at least 3 characters"],
-      maxlength: [200, "Title cannot exceed 200 characters"],
+      required: true,
     },
+
     description: {
       type: String,
-      required: [true, "Project description is required"],
-      trim: true,
-      minlength: [10, "Description must be at least 10 characters"],
+      default: "",
     },
+
     start_date: {
       type: Date,
-      required: [true, "Start date is required"],
     },
+
     end_date: {
       type: Date,
-      required: [true, "End date is required"],
-      validate: {
-        validator: function (value) {
-          return value > this.start_date;
-        },
-        message: "End date must be after start date",
-      },
     },
+
+    students: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+      ],
+      validate: [
+        {
+          validator: function (value) {
+            return value.length <= 2;
+          },
+          message: "A project can have a maximum of 2 students.",
+        },
+      ],
+      required: true, // At least 1 student required
+    },
+
     student_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: [true, "Student is required"],
     },
+
     company_supervisor_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+
     university_supervisor_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-    },
-    status: {
-      type: String,
-      enum: ["pending", "in_progress", "completed", "cancelled"],
-      default: "pending",
     },
   },
   {
@@ -53,4 +58,4 @@ const projectSchema = new mongoose.Schema(
   }
 );
 
-export const Project = mongoose.model("Project", projectSchema);
+export const Project = mongoose.model("Project", ProjectSchema);
