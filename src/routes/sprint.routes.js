@@ -6,18 +6,32 @@ import {
   updateSprint,
   deleteSprint,
   getSprintDashboard,
-  createSprint,
 } from "../controllers/sprint.controller.js";
 const router = express.Router();
 
 // Get sprint by ID
-router.get("/:sprintId", loggedMiddleware, getSprintById);
+router.get(
+  "/:sprintId",
+  loggedMiddleware,
+  requireRole("etudiant"),
+  getSprintById
+);
 
 // Update sprint
-router.put("/:sprintId", loggedMiddleware, updateSprint);
+router.put(
+  "/:sprintId",
+  loggedMiddleware,
+  requireRole("etudiant"),
+  updateSprint
+);
 
 // Delete sprint
-router.delete("/:sprintId", loggedMiddleware, deleteSprint);
+router.delete(
+  "/:sprintId",
+  loggedMiddleware,
+  requireRole("etudiant"),
+  deleteSprint
+);
 
 router.get(
   "/:sprintId/dashboard",

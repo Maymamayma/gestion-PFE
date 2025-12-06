@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import { Project } from "../models/Project.model.js";
+import { User } from "../models/user.model.js";
+
 import { generateDashboard } from "../services/project.service.js";
 //---------------------------------------DONE-----------------------
 // Get all projects
@@ -51,28 +53,110 @@ export const fetchAllProjects = async (req, res) => {
 // Create a project
 export const createProject = async (req, res) => {
   try {
+    const {
+      title,
+      description,
+      start_date,
+      end_date,
+      students,
+      company_supervisor_id,
+      university_supervisor_id,
+    } = req.body;
+
+    if (
+      !title ||
+      !description ||
+      !start_date ||
+      !end_date ||
+      !Array.isArray(students) ||
+      !company_supervisor_id ||
+      !university_supervisor_id
+    ) {
+      return res.status(400).json({
+        error:
+          "All fields (title, description, dates, and user IDs) are required.",
+      });
+    }
+
+    if (students.length > 2) {
+      return res.status(400).json({
+        error: "A project can have a maximum of 2 students.",
+      });
+    }
+
+    const uniqueStudents = new Set(students);
+    if (uniqueStudents.size !== students.length) {
+      return res.status(400).json({
+        error: "Duplicate student IDs are not allowed.",
+      });
+    }
+    // hethi bech ttchecki date ta3 endate cuz cant be in the past
+    const today = new Date();
+    const endDateObj = new Date(end_date);
+
+    if (endDateObj < today.setHours(0, 0, 0, 0)) {
+      return res.status(400).json({
+        error: "End date must be today or in the future.",
+      });
+    }
+
+    // Student
+    for (let id of students) {
+      const student = await User.findById(id);
+      if (!student || student.role !== "etudiant") {
+        return res.status(400).json({
+          error: `Invalid student ID '${id}'. User not found or not a student.`,
+        });
+      }
+    }
+
+    // Company Supervisor
+    const companySupervisor = await User.findById(company_supervisor_id);
+    if (!companySupervisor || companySupervisor.role !== "encad_entreprise") {
+      return res.status(400).json({
+        error:
+          "Invalid company_supervisor_id. User does not exist or is not a company supervisor.",
+      });
+    }
+
+    // University Supervisor
+    const universitySupervisor = await User.findById(university_supervisor_id);
+    if (
+      !universitySupervisor ||
+      universitySupervisor.role !== "encad_universitaire"
+    ) {
+      return res.status(400).json({
+        error:
+          "Invalid university_supervisor_id. User does not exist or is not a university supervisor.",
+      });
+    }
+
     const project = new Project({
-      title: req.body.title,
-      description: req.body.description,
-      start_date: req.body.start_date,
-      end_date: req.body.end_date,
-      student_id: req.body.student_id,
-      company_supervisor_id: req.body.company_supervisor_id,
-      university_supervisor_id: req.body.university_supervisor_id,
+      title,
+      description,
+      start_date,
+      end_date,
+      students,
+      company_supervisor_id,
+      university_supervisor_id,
     });
 
     const returnedProject = await project.save();
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Project created successfully",
       project: returnedProject,
     });
   } catch (err) {
+    console.error("Project creation error:", err);
+
     if (err.name === "ValidationError") {
-      res.status(400).json({ message: "Validation error: " + err.message });
-    } else {
-      res.status(500).json({ message: "Server error: " + err.message });
+      return res
+        .status(400)
+        .json({ message: "Validation error: " + err.message });
     }
+
+    return res.status(500).json({ message: "Server error: " + err.message });
   }
 };
 
@@ -80,8 +164,8 @@ export const createProject = async (req, res) => {
 export const fetchProjectById = async (req, res) => {
   //ti hay jawha bh ma8ir objectid , thaya3t 7yeti fi java
   try {
-    const project = await Project.findById(req.params.id)
-      .populate("student_id", "name email role")
+    const project = await Project.findById(req.params.projectId)
+      .populate("students", "name email role")
       .populate("company_supervisor_id", "name email role")
       .populate("university_supervisor_id", "name email role");
 
@@ -98,17 +182,33 @@ export const fetchProjectById = async (req, res) => {
 // Update a project
 export const updateProject = async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const project = await Project.findById(req.params.projectId);
 
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    const updated = await Project.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    })
-      .populate("student_id", "name email role")
+    //Validate fields in req.body yani ma nupdatich 7aja mouch mawjouda fil model
+    const allowedFields = Object.keys(Project.schema.paths);
+    const receivedFields = Object.keys(req.body);
+
+    // Check if user tries to update a non-existing attribute
+    for (let field of receivedFields) {
+      if (!allowedFields.includes(field)) {
+        return res.status(400).json({
+          message: `Field '${field}' does not exist in Project model.`,
+        });
+      }
+    }
+    const updated = await Project.findByIdAndUpdate(
+      req.params.projectId,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
+      .populate("students", "name email role")
       .populate("company_supervisor_id", "name email role")
       .populate("university_supervisor_id", "name email role");
 
@@ -128,7 +228,7 @@ export const updateProject = async (req, res) => {
 // Delete a project
 export const deleteProject = async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const project = await Project.findById(req.params.projectId);
 
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
@@ -142,11 +242,9 @@ export const deleteProject = async (req, res) => {
   }
 };
 
-//---------------------------------------DONE-----------------------
-
 export const getProjectDashboard = async (req, res) => {
   try {
-    const projectId = req.params.id;
+    const projectId = req.params.projectId;
 
     const dashboard = await generateDashboard(projectId);
 
@@ -155,10 +253,10 @@ export const getProjectDashboard = async (req, res) => {
       data: dashboard,
     });
   } catch (error) {
-    console.error("Dashboard error:", error);
     return res.status(500).json({
       success: false,
       message: "Dashboard error.",
     });
   }
 };
+//---------------------------------------DONE-----------------------

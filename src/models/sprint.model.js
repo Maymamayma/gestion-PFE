@@ -48,7 +48,7 @@ const SprintSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true,
+    timestamps: true, // lili yatase2il hethi ech dir : enables createdAt and updatedAt fil mongo (za7 ken jet tarcha9 dinya 7ad ma yfi9 XD)
   }
 );
 
