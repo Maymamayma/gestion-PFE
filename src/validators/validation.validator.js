@@ -1,16 +1,16 @@
 import { z } from "zod";
 
-// Schéma de validation pour valider une tâche
+// Validation schema for validating a task
 const validateTaskSchema = z.object({
   body: z.object({
     isValid: z.boolean({
-      required_error: "Le champ isValid est requis",
-      invalid_type_error: "isValid doit être un booléen (true/false)",
+      required_error: "The isValid field is required",
+      invalid_type_error: "isValid must be a boolean (true/false)",
     }),
 
     comment: z
       .string()
-      .max(1000, "Le commentaire ne peut pas dépasser 1000 caractères")
+      .max(1000, "Comment cannot exceed 1000 characters")
       .trim()
       .optional(),
   }),
@@ -18,9 +18,9 @@ const validateTaskSchema = z.object({
   params: z.object({
     taskId: z
       .string({
-        required_error: "L'ID de la tâche est requis",
+        required_error: "Task ID is required",
       })
-      .regex(/^[0-9a-fA-F]{24}$/, "ID de tâche invalide"),
+      .regex(/^[0-9a-fA-F]{24}$/, "Invalid task ID"),
   }),
 });
 
