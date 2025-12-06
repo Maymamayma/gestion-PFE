@@ -6,6 +6,7 @@ import {
   updateSprint,
   deleteSprint,
   getSprintDashboard,
+  createSprint,
 } from "../controllers/sprint.controller.js";
 const router = express.Router();
 

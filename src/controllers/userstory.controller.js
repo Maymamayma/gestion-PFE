@@ -1,10 +1,10 @@
-import { create } from "../services/userStory.service.js";
+import * as UserStoryService from "../services/userStory.service.js";
 
 export const createUserStory = async (req, res) => {
   try {
     const { projectId, sprintId } = req.params;
 
-    const newStory = await create({
+    const newStory = await UserStoryService.create({
       ...req.body,
       projectId,
       sprintId,
@@ -15,11 +15,12 @@ export const createUserStory = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 export const listUserStories = async (req, res) => {
   try {
     const { projectId, sprintId } = req.params;
 
-    const stories = await UserStoryService.list(projectId, sprintId);
+    const stories = await UserStoryService.listBySprint(projectId, sprintId);
     res.json(stories);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -39,13 +40,14 @@ export const getUserStory = async (req, res) => {
 };
 export const updateUserStory = async (req, res) => {
   try {
-    const { projectId,sprintId,userStoryId } = req.params;
+    const { projectId, sprintId, userStoryId } = req.params;
 
     const updated = await UserStoryService.update(
       userStoryId,
       projectId,
       sprintId,
-      req.body);
+      req.body
+    );
 
     if (!updated)
       return res.status(404).json({ error: "User story not found" });

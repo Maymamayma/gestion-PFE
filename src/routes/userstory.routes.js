@@ -1,4 +1,6 @@
-/*import express from "express";
+import express from "express";
+import { loggedMiddleware } from "../middleware/auth.js";
+import { requireRole } from "../middleware/roles.js";
 import {
   createUserStory,
   updateUserStory,
@@ -11,22 +13,25 @@ import {
   createUserStorySchema,
   updateUserStorySchema,
   userStoryParamsSchema, // The generic schema for params validation
-} from "../validators/userStory.validator.js"; 
+} from "../validators/userStory.validator.js";
 
 const router = express.Router();
-
 
 // CREATE User Story
 router.post(
   "/projects/:projectId/sprints/:sprintId/userStories",
   validateRequest(createUserStorySchema), // Validates body and params
+  loggedMiddleware,
+  requireRole("etudiant"),
   createUserStory
 );
 
 // LIST all user stories for a sprint
-router.get( 
+router.get(
   "/projects/:projectId/sprints/:sprintId/userStories",
   validateRequest(userStoryParamsSchema), // Validates projectId and sprintId
+  loggedMiddleware,
+  requireRole("etudiant"),
   listUserStories
 );
 
@@ -34,6 +39,8 @@ router.get(
 router.get(
   "/projects/:projectId/sprints/:sprintId/userStories/:userStoryId",
   validateRequest(userStoryParamsSchema), // Validates all three IDs
+  loggedMiddleware,
+  requireRole("etudiant"),
   getUserStory
 );
 
@@ -41,6 +48,8 @@ router.get(
 router.put(
   "/projects/:projectId/sprints/:sprintId/userStories/:userStoryId",
   validateRequest(updateUserStorySchema), // Validates optional body and all three IDs
+  loggedMiddleware,
+  requireRole("etudiant"),
   updateUserStory
 );
 
@@ -48,8 +57,9 @@ router.put(
 router.delete(
   "/projects/:projectId/sprints/:sprintId/userStories/:userStoryId",
   validateRequest(userStoryParamsSchema), // Validates all three IDs
+  loggedMiddleware,
+  requireRole("etudiant"),
   deleteUserStory
 );
 
 export { router };
-*/

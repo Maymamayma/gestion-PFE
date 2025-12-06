@@ -41,7 +41,7 @@ router.delete("/:id", loggedMiddleware, requireRole("etudiant"), deleteProject);
 //---------------------------sprint ---------------------------
 // Create sprint
 router.post(
-  "/:id/sprints",
+  "/:projectId/sprints",
   loggedMiddleware,
   requireRole("etudiant"),
   createSprint
