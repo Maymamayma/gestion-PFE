@@ -1,8 +1,7 @@
 import { z } from "zod";
 import mongoose from "mongoose";
 
-//  function to check for a valid MongoDB ObjectId.
-
+// Function to check for a valid MongoDB ObjectId
 const objectId = z
   .string()
   .refine((val) => mongoose.Types.ObjectId.isValid(val), {
@@ -11,7 +10,6 @@ const objectId = z
 
 // Schema for CREATING a User Story
 export const createUserStorySchema = z.object({
-  // Validate the request body
   body: z.object({
     title: z
       .string({ required_error: "Title is required." })
@@ -40,18 +38,15 @@ export const createUserStorySchema = z.object({
       return date;
     }),
   }),
-  // Validate the URL parameters
   params: z.object({
     projectId: objectId,
     sprintId: objectId,
   }),
 });
 
-//   Schema for UPDATING a User Story
+// Schema for UPDATING a User Story
 export const updateUserStorySchema = z.object({
-  // For updates, the body fields are all optional.
-  body: createUserStorySchema.shape.body.partial(),
-  // But the IDs in the URL are still required and must be valid.
+  body: createUserStorySchema.shape.body.partial(), // All body fields optional for updates
   params: z.object({
     projectId: objectId,
     sprintId: objectId,
@@ -59,12 +54,11 @@ export const updateUserStorySchema = z.object({
   }),
 });
 
-//   Schema for GETTING, LISTING, or DELETING
-//  we only need to validate the URL parameters.
+// Schema for GETTING, LISTING, or DELETING a User Story
 export const userStoryParamsSchema = z.object({
   params: z.object({
     projectId: objectId,
     sprintId: objectId,
-    userStoryId: objectId.optional(), // userStoryId is not present in the "list" route
+    userStoryId: objectId.optional(), // userStoryId not required for list route
   }),
 });
