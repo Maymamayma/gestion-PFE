@@ -8,13 +8,13 @@ export const validateTask = async (req, res) => {
     const { isValid, comment, meetingId } = req.body;
 
     const task = await Task.findById(taskId);
-    if (!task) return res.status(404).json({ error: "Tâche non trouvée" });
+    if (!task) return res.status(404).json({ error: "Task not found " });
 
     // Verify meeting exists if provided
     if (meetingId) {
       const reunion = await Reunion.findById(meetingId);
       if (!reunion) {
-        return res.status(404).json({ error: "Réunion non trouvée" });
+        return res.status(404).json({ error: "Meeting not found" });
       }
     }
 
@@ -28,7 +28,7 @@ export const validateTask = async (req, res) => {
     });
 
     res.json({
-      message: "Tâche validée avec succès",
+      message: "Task validated successfully",
       validation,
     });
   } catch (error) {

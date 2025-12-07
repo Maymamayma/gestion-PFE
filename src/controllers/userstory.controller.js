@@ -4,7 +4,7 @@ import {
   createUserStorySchema,
   updateUserStorySchema,
   userStoryParamsSchema,
-} from "../validators/userStory.validator.js"; // Adjust the path to your schema file
+} from "../validators/userStory.validator.js"; 
 
 // Handles Zod and other errors, sending a structured response
 const handleErrors = (res, error) => {
@@ -12,7 +12,7 @@ const handleErrors = (res, error) => {
     // If it's a Zod validation error, send a 400 with detailed issues
     return res.status(400).json({ errors: error.flatten().fieldErrors });
   }
-  // For other errors (e.g., database issues), send a generic 500
+  // For other errors 
   console.error(error); // It's good practice to log the actual error on the server
   return res
     .status(500)

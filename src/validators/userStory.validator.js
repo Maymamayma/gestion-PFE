@@ -1,6 +1,6 @@
 import { z } from "zod";
 import mongoose from "mongoose";
-import { Sprint } from "../models/sprint.model.js"; // adjust path
+import { Sprint } from "../models/sprint.model.js"; 
 
 // Function to check for a valid MongoDB ObjectId
 const objectId = z
@@ -68,8 +68,7 @@ export const validateUserStoryDatesWithSprint = async (req, res, next) => {
     const { sprintId } = req.params;
     const { start_date, end_date } = req.body;
 
-    // Import Sprint model (adjust path as needed)
-
+   
     // Fetch sprint
     const sprint = await Sprint.findById(sprintId);
 
