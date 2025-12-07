@@ -1,31 +1,17 @@
 import express from "express";
 import {
-  validateTask,
+  getReunionValidations,
   getTaskValidations,
+  validateTask,
 } from "../controllers/validation.controller.js";
 import { loggedMiddleware as authenticate } from "../middleware/auth.js";
 
-import { validate } from "../middleware/validate.js";
-import { validateTaskSchema } from "../validators/validation.validator.js";
-import { taskIdParamSchema } from "../validators/task.validator.js";
 import { requireRole } from "../middleware/roles.js";
+import { validate } from "../middleware/validate.js";
+import { taskIdParamSchema } from "../validators/task.validator.js";
+import { reunionIdParamSchema, validateTaskSchema } from "../validators/validation.validator.js";
 const router = express.Router();
 
-// Middleware personnalisé : Encadrants seulement (entreprise OU universitaire)
-const isSupervisor = (req, res, next) => {
-  if (!req.auth) {
-    return res.status(401).json({ error: "Non authentifié" });
-  }
-
-  const role = req.auth.role;
-  if (role === "encad_entreprise" || role === "encad_universitaire") {
-    next();
-  } else {
-    return res.status(403).json({
-      error: "Accès interdit. Seuls les encadrants peuvent valider les tâches.",
-    });
-  }
-};
 
 // Valider une tâche - ENCADRANTS SEULEMENT
 /**
@@ -33,7 +19,7 @@ const isSupervisor = (req, res, next) => {
  * /api/validations/tasks/{taskId}/validate:
  *   post:
  *     summary: Valider une tâche
- *     description: Valide une tâche spécifique (isValid true/false + commentaire optionnel). Nécessite auth (ENCADRANT entreprise OU universitaire).
+ *     description: Valide une tâche spécifique (isValid true/false + commentaire optionnel + réunion optionnelle). Nécessite auth (ENCADRANT entreprise OU universitaire).
  *     tags: [Validations]
  *     security:
  *       - bearerAuth: []
@@ -57,6 +43,10 @@ const isSupervisor = (req, res, next) => {
  *               comment:
  *                 type: string
  *                 example: "Code bien structuré, mais ajouter des tests unitaires."
+ *               meetingId:
+ *                 type: string
+ *                 example: "64f...xyz"
+ *                 description: ID de la réunion (optionnel, null = hors réunion)
  *             required: [isValid]
  *     responses:
  *       201:
@@ -80,7 +70,6 @@ router.post(
   "/tasks/:taskId/validate",
   authenticate,
   requireRole("encad_entreprise", "encad_universitaire"),
-
   validate(validateTaskSchema),
   validateTask
 );
@@ -125,6 +114,49 @@ router.get(
   getTaskValidations
 );
 
+// Récupérer validations d'une réunion - TOUS (authentifiés)
+/**
+ * @swagger
+ * /api/validations/meetings/{meetingId}/validations:
+ *   get:
+ *     summary: Lister les validations d'une réunion
+ *     description: Récupère toutes les validations liées à une réunion spécifique.
+ *     tags: [Validations]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: meetingId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la réunion
+ *     responses:
+ *       200:
+ *         description: Liste des validations
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: integer
+ *                 validations:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Validation'
+ *       401:
+ *         description: Non authentifié
+ *       500:
+ *         description: Erreur serveur
+ */
+router.get(
+  "/meetings/:meetingId/validations",
+  authenticate,
+  validate(reunionIdParamSchema),
+  getReunionValidations
+);
+
 /**
  * @swagger
  * components:
@@ -151,6 +183,10 @@ router.get(
  *           type: string
  *           format: date-time
  *           example: "2025-12-04T10:00:00Z"
+ *         meetingId:
+ *           type: string
+ *           example: "64f...ghi"
+ *           description: "ID de la réunion (null si hors réunion)"
  *         typeValidation:
  *           type: string
  *           enum: ["Tache"]
@@ -158,3 +194,4 @@ router.get(
  */
 
 export { router };
+

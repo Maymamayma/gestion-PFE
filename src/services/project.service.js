@@ -1,10 +1,10 @@
-import { Project } from "../models/Project.model.js";
-import { Sprint } from "../models/Sprint.model.js";
+import { formatDashboard } from "../helpers/ProjectDashboard.js";
+import { Meeting } from "../models/meeting.model.js";
+import { Project } from "../models/project.model.js";
+import { Report } from "../models/report.model.js";
+import { Sprint } from "../models/sprint.model.js";
 import { Task } from "../models/task.model.js";
 import { Validation } from "../models/validation.model.js";
-import { Meeting } from "../models/meeting.model.js";
-import { Report } from "../models/report.model.js";
-import { formatDashboard } from "../helpers/ProjectDashboard.js";
 
 export const generateDashboard = async (projectId) => {
   const project = await Project.findById(projectId).lean();
