@@ -2,10 +2,21 @@ import { TaskService } from "../services/task.service.js";
 import { TaskHistory } from "../models/TaskHistory.model.js";
 import { generateProjectReportHTML } from "../utils/htmlReportProject.js";
 import { Project } from "../models/project.model.js";
+import { Sprint } from "../models/sprint.model.js";
 
 export const generateProjectReport = async (req, res) => {
   try {
     const { projectId } = req.params;
+
+    // Vérifier que le projet existe
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    // Récupérer tous les sprints du projet 
+    const sprints = await Sprint.find({ project_id: projectId })
+      .sort({ number: 1 });  // Tri par numéro de sprint
 
     // Récupérer toutes les tâches du projet
     const allTasks = await TaskService.list(projectId, {});
@@ -16,14 +27,6 @@ export const generateProjectReport = async (req, res) => {
       .sort({ changedAt: -1 })
       .populate("taskId", "title")
       .populate("changedBy", "user_name email");
-
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res.status(404).json({ error: "Project not found" });
-    }
-
-    // Sprints (vide pour l'instant, à adapter si vous avez le modèle Sprint)
-    const sprints = [];
 
     // Générer le HTML
     const html = generateProjectReportHTML(
