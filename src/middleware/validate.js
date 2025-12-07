@@ -38,7 +38,7 @@ export const validate = (schema) => {
         console.error("📋 Validation errors:", JSON.stringify(errors, null, 2));
 
         return res.status(400).json({
-          error: "Validation échouée",
+          error: "Validation failed",
           details: errors,
           raw: error.errors,
         });
@@ -47,8 +47,8 @@ export const validate = (schema) => {
       // Autres erreurs
       console.error(" Non-Zod error:", error);
       return res.status(500).json({
-        error: "Erreur de validation",
-        message: error?.message || "Erreur inconnue",
+        error: "Validation error",
+        message: error?.message || "Unknown error",
         stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
       });
     }
@@ -74,12 +74,12 @@ export const validateRequest = (schemas) => {
           message: err.message,
         }));
         return res.status(400).json({
-          error: "Validation échouée",
+          error: "Validation failed",
           details: errors,
         });
       }
       return res.status(500).json({
-        error: "Erreur interne de validation",
+        error: "Internal validation error",
         message: error.message,
       });
     }
