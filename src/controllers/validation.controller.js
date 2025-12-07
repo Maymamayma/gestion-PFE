@@ -1,37 +1,65 @@
-import { create } from "../services/validation.service.js";
-
+import { Reunion } from "../models/meeting.model.js";
 import { Task } from "../models/task.model.js";
+import * as ValidationService from "../services/validation.service.js";
 
 export const validateTask = async (req, res) => {
   try {
     const { taskId } = req.params;
-    const { isValid, comment } = req.body;
+    const { isValid, comment, meetingId } = req.body;
 
     const task = await Task.findById(taskId);
-    if (!task) return res.status(404).json({ error: "Task not found" });
+    if (!task) return res.status(404).json({ error: "Tâche non trouvée" });
 
-    const validation = await create({
+    // Verify meeting exists if provided
+    if (meetingId) {
+      const reunion = await Reunion.findById(meetingId);
+      if (!reunion) {
+        return res.status(404).json({ error: "Réunion non trouvée" });
+      }
+    }
+
+    const validation = await ValidationService.create({
       taskId,
-      isValid,
-      comment,
+      estValide: isValid,
+      commentaire: comment || "",
+      reunionId: meetingId || null,
       typeValidation: "Tache",
-      validatedBy: req.user?.id || "temporary_user_id",
+      validatedBy: req.user?.id,
     });
 
     res.json({
-      message: "Task validated",
+      message: "Tâche validée avec succès",
       validation,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 export const getTaskValidations = async (req, res) => {
   try {
     const { taskId } = req.params;
     const validations = await ValidationService.listByTask(taskId);
-    res.json(validations);
+    res.json({
+      count: validations.length,
+      validations,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const getReunionValidations = async (req, res) => {
+  try {
+    const { meetingId } = req.params;
+    const validations = await ValidationService.listByReunion(meetingId);
+    res.json({
+      count: validations.length,
+      validations,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+

@@ -13,6 +13,13 @@ const validateTaskSchema = z.object({
       .max(1000, "Comment cannot exceed 1000 characters")
       .trim()
       .optional(),
+
+    meetingId: z
+      .string()
+      .regex(/^[0-9a-fA-F]{24}$/, "ID de réunion invalide")
+      .optional()
+      .or(z.literal(""))
+      .nullable(),
   }),
 
   params: z.object({
@@ -24,4 +31,16 @@ const validateTaskSchema = z.object({
   }),
 });
 
-export { validateTaskSchema };
+// Schema for reunion ID param (using meetingId to match route)
+const reunionIdParamSchema = z.object({
+  params: z.object({
+    meetingId: z
+      .string({
+        required_error: "L'ID de la réunion est requis",
+      })
+      .regex(/^[0-9a-fA-F]{24}$/, "ID de réunion invalide"),
+  }),
+});
+
+export { reunionIdParamSchema, validateTaskSchema };
+

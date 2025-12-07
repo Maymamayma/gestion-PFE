@@ -111,12 +111,92 @@ Débogage & ajustements finaux avant merge.
 
 ---
 
-## **Groupe D — Khair Hammai & Aymen Settey**
+##  **Groupe D — Khairi Hammami & Aymen Settey**
 
 ### **Work Distribution**
 
-- …
-- …
+L'équipe D a implémenté le module **Validations & Réunions** du système de gestion de PFE.
+
+#### **Répartition des tâches**
+
+* **Aymen Settey** : 
+  - Développement du système de réunions (Meeting model, service, controller)
+  - Intégration des références de réunions dans les validations
+  - Développement des endpoints de validation liés aux réunions
+  - Documentation Swagger pour les endpoints de réunions
+
+* **Khairi Hammami** :
+  - Réparation et Amélioration du système de réunions et validation
+  - Implémentation des endpoints CRUD pour les réunions
+  - Système de validation du contenu des réunions par l'encadrant universitaire et professionnel
+  - Création de la collection Postman pour les tests
+
+#### **Fonctionnalités implémentées**
+
+**1. Gestion des Réunions (Meetings)**
+- Création de réunions avec ordre du jour (agenda)
+- Mise à jour des réunions non complétées
+- Complétion des réunions avec compte rendu réel (actualReport)
+- Validation du contenu des réunions par l'encadrant universitaire
+- Système de références : une réunion peut référencer une User Story, Task, ou Report
+- Filtrage des réunions (à venir, complétées, par projet)
+- Suppression de réunions
+
+**2. Système de Validation Amélioré**
+- Validation de tâches avec référence optionnelle à une réunion
+- Support "hors réunion" (meetingId = null)
+- Récupération des validations par tâche
+- Récupération des validations par réunion
+- Horodatage et traçabilité complète
+
+**3. Endpoints API développés**
+
+#### **Endpoints Réunions (Meetings)**
+
+| Méthode | Route | Description | Rôle |
+|---------|-------|-------------|------|
+| POST | `/api/meetings` | Créer une réunion avec ordre du jour | Étudiant |
+| GET | `/api/meetings` | Lister toutes les réunions (avec filtre projet optionnel) | Tous |
+| GET | `/api/meetings/upcoming` | Récupérer les réunions à venir (statut Planifiee) | Tous |
+| GET | `/api/meetings/completed` | Récupérer les réunions effectuées (statut Effectuee) | Tous |
+| GET | `/api/meetings/cancelled` | Récupérer les réunions annulées (statut Annulee) | Tous |
+| GET | `/api/meetings/:id` | Récupérer les détails d'une réunion spécifique | Tous |
+| PUT | `/api/meetings/:id` | Modifier une réunion non effectuée | Étudiant |
+| POST | `/api/meetings/:id/complete` | Compléter une réunion avec compte rendu | Étudiant |
+| POST | `/api/meetings/:id/cancel` | Annuler une réunion planifiée | Étudiant |
+| POST | `/api/meetings/:id/validate` | Valider le contenu d'une réunion effectuée | Encadrant universitaire |
+| DELETE | `/api/meetings/:id` | Supprimer une réunion | Étudiant |
+
+#### **Endpoints Validations**
+
+| Méthode | Route | Description | Rôle |
+|---------|-------|-------------|------|
+| POST | `/api/validations/tasks/:taskId/validate` | Valider une tâche (avec réunion optionnelle) | Encadrants |
+| GET | `/api/validations/tasks/:taskId/validations` | Récupérer toutes les validations d'une tâche | Tous |
+| GET | `/api/validations/meetings/:meetingId/validations` | Récupérer les validations liées à une réunion | Tous |
+
+**4. Modèles de données**
+
+*Meeting Model:*
+- projectId, plannedDate, agenda, actualReport
+- isCompleted, referenceType, referenceId
+- isValidated, validatedBy, validatedAt, validationComment
+- createdBy, timestamps
+
+*Validation Model (amélioré):*
+- taskId, isValid, comment, validatedBy, validatedAt
+- meetingId (optionnel), typeValidation
+
+**5. Contrôle d'accès (RBAC)**
+- Étudiant : création, modification, complétion, suppression de réunions
+- Encadrant entreprise : validation de tâches
+- Encadrant universitaire : validation de tâches + validation du contenu des réunions
+
+**6. Documentation et Tests**
+- Documentation Swagger complète pour tous les endpoints
+- Collection Postman avec scénarios de test complets
+- Validation Zod pour toutes les entrées
+- Gestion d'erreurs robuste
 
 ---
 

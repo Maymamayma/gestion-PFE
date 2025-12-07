@@ -1,7 +1,7 @@
-import { Sprint } from "../models/Sprint.model.js";
-import { Project } from "../models/Project.model.js";
-import { UserStory } from "../models/UserStory.model.js";
+import { Project } from "../models/project.model.js";
+import { Sprint } from "../models/sprint.model.js";
 import { Task } from "../models/task.model.js";
+import { UserStory } from "../models/UserStory.model.js";
 
 // --------------------------DONE-------------------------
 

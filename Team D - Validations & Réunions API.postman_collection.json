@@ -1,0 +1,527 @@
+{
+	"info": {
+		"_postman_id": "f34f52b1-f5c5-4c17-881d-2e2172c3a5ed",
+		"name": "Team D - Validations & Réunions API",
+		"description": "Collection complète des endpoints pour le module Validations & Réunions (Team D - Aymen Settey & Khairi Hammami)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19191458"
+	},
+	"item": [
+		{
+			"name": "Meetings",
+			"item": [
+				{
+					"name": "Create Meeting",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Brearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTM0NjIxMTA3YWVhYjhkZjc0ZDIxZjYiLCJyb2xlIjoiZXR1ZGlhbnQiLCJpYXQiOjE3NjUwNzkyNjgsImV4cCI6MTc2NTA4NjQ2OH0.EBtkJKUgJEK4DMReVLnL9ln_ERFDjsbbZLR9pR9_EvA",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"projectId\": \"{{project_id}}\",\n  \"datePlanification\": \"2025-12-27T14:00:00Z\",\n  \"ordreDuJour\": \"Reunion fin annee\",\n  \"referenceType\": \"UserStory\",\n  \"referenceId\": \"{{userstory_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/meetings",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"meetings"
+							]
+						},
+						"description": "Créer une nouvelle réunion (Étudiant uniquement)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Meetings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Brearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTM0NjIxMTA3YWVhYjhkZjc0ZDIxZjYiLCJyb2xlIjoiZXR1ZGlhbnQiLCJpYXQiOjE3NjUwNzkyNjgsImV4cCI6MTc2NTA4NjQ2OH0.EBtkJKUgJEK4DMReVLnL9ln_ERFDjsbbZLR9pR9_EvA",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/meetings?projectId={{project_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"meetings"
+							],
+							"query": [
+								{
+									"key": "projectId",
+									"value": "{{project_id}}"
+								}
+							]
+						},
+						"description": "Récupérer toutes les réunions avec filtre optionnel par projet"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Upcoming Meetings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/meetings/upcoming?projectId={{project_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"meetings",
+								"upcoming"
+							],
+							"query": [
+								{
+									"key": "projectId",
+									"value": "{{project_id}}"
+								}
+							]
+						},
+						"description": "Récupérer les réunions à venir (non complétées)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Completed Meetings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/meetings/completed?projectId={{project_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"meetings",
+								"completed"
+							],
+							"query": [
+								{
+									"key": "projectId",
+									"value": "{{project_id}}"
+								}
+							]
+						},
+						"description": "Récupérer les réunions complétées"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cancelled Meetings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/meetings/cancelled?projectId={{project_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"meetings",
+								"cancelled"
+							],
+							"query": [
+								{
+									"key": "projectId",
+									"value": "{{project_id}}"
+								}
+							]
+						},
+						"description": "Récupérer les réunions complétées"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Meeting By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/meetings/{{meeting_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"meetings",
+								"{{meeting_id}}"
+							]
+						},
+						"description": "Récupérer les détails d'une réunion spécifique"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Meeting",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"datePlanification\": \"2025-12-30T15:00:00.000Z\",\n  \"ordreDuJour\": \"Updated agenda\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/meetings/{{meeting_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"meetings",
+								"{{meeting_id}}"
+							]
+						},
+						"description": "Mettre à jour une réunion non complétée (Étudiant uniquement)"
+					},
+					"response": []
+				},
+				{
+					"name": "Complete Meeting",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"compteRendu\": \"Meeting report: We discussed the sprint goals and assigned tasks.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/meetings/{{meeting_id}}/complete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"meetings",
+								"{{meeting_id}}",
+								"complete"
+							]
+						},
+						"description": "Compléter une réunion avec le compte rendu réel (Étudiant uniquement)"
+					},
+					"response": []
+				},
+				{
+					"name": "STUDENT - Validate Meeting Content",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"estValide\": true,\n  \"commentaire\": \"Good meeting report\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/meetings/{{meeting_id}}/validate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"meetings",
+								"{{meeting_id}}",
+								"validate"
+							]
+						},
+						"description": "Valider le contenu d'une réunion (Encadrant universitaire uniquement)"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Meeting",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/meetings/6934f937cc7a65b188f44b47/cancel",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"meetings",
+								"6934f937cc7a65b188f44b47",
+								"cancel"
+							]
+						},
+						"description": "Supprimer une réunion (Étudiant uniquement)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Meeting",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/meetings/{{meeting_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"meetings",
+								"{{meeting_id}}"
+							]
+						},
+						"description": "Supprimer une réunion (Étudiant uniquement)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Validations",
+			"item": [
+				{
+					"name": "Validate Task (Without Meeting)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"isValid\": true,\n  \"comment\": \"Code bien structuré et testé. Approuvé.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/validations/tasks/{{task_id}}/validate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"validations",
+								"tasks",
+								"{{task_id}}",
+								"validate"
+							]
+						},
+						"description": "Valider une tâche hors réunion (Encadrants uniquement)"
+					},
+					"response": []
+				},
+				{
+					"name": "Validate Task (With Meeting)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"isValid\": true,\n  \"comment\": \"Tâche validée lors de la réunion du 15/12. Bon travail.\",\n  \"meetingId\": \"{{meeting_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/validations/tasks/{{task_id}}/validate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"validations",
+								"tasks",
+								"{{task_id}}",
+								"validate"
+							]
+						},
+						"description": "Valider une tâche pendant une réunion (Encadrants uniquement)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Task Validations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/validations/tasks/{{task_id}}/validations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"validations",
+								"tasks",
+								"{{task_id}}",
+								"validations"
+							]
+						},
+						"description": "Récupérer toutes les validations d'une tâche"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Meeting Validations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/validations/meetings/{{meeting_id}}/validations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"validations",
+								"meetings",
+								"{{meeting_id}}",
+								"validations"
+							]
+						},
+						"description": "Récupérer toutes les validations liées à une réunion"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Auth As Student",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"abir@test.com\",\n  \"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Auth Enc.",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"khairi@test.com\",\r\n  \"password\": \"123456\",\r\n  \"name\": \"3ami el encadrant\",\r\n  \"role\" : \"encad_universitaire\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{auth_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5000",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "project_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "meeting_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "task_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userstory_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "report_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
