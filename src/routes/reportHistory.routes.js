@@ -1,11 +1,10 @@
 import express from "express";
+import { loggedMiddleware } from "../middleware/auth.js";
+import { requireRole } from "../middleware/roles.js";
 import {
   listHistory,
   downloadReport,
 } from "../controllers/reportHistory.controller.js";
-import {
-  loggedMiddleware as authenticate,
-} from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -53,7 +52,8 @@ const router = express.Router();
  */
 router.get(
   "/projects/:projectId/reports",
-  authenticate,  // Tous peuvent consulter l'historique
+  loggedMiddleware,
+  requireRole("etudiant", "encad_universitaire", "encad_entreprise"),
   listHistory
 );
 
@@ -108,7 +108,8 @@ router.get(
  */
 router.get(
   "/projects/:projectId/reports/:reportId/download",
-  authenticate,  // Tous peuvent télécharger
+  loggedMiddleware,
+  requireRole("etudiant", "encad_universitaire", "encad_entreprise"),
   downloadReport
 );
 

@@ -16,7 +16,7 @@ const validateTaskSchema = z.object({
 
     meetingId: z
       .string()
-      .regex(/^[0-9a-fA-F]{24}$/, "ID de réunion invalide")
+      .regex(/^[0-9a-fA-F]{24}$/, " Invalid meeting ID  ")
       .optional()
       .or(z.literal(""))
       .nullable(),
@@ -36,9 +36,9 @@ const reunionIdParamSchema = z.object({
   params: z.object({
     meetingId: z
       .string({
-        required_error: "L'ID de la réunion est requis",
+        required_error: "Meeting ID is required",
       })
-      .regex(/^[0-9a-fA-F]{24}$/, "ID de réunion invalide"),
+      .regex(/^[0-9a-fA-F]{24}$/, "Invalid meeting ID"),
   }),
 });
 

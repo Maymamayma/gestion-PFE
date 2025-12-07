@@ -14,7 +14,7 @@ export const createMeeting = async (req, res) => {
     // Verify project exists
     const project = await Project.findById(projectId);
     if (!project) {
-      return res.status(404).json({ error: "Projet non trouvé" });
+      return res.status(404).json({ error: "Project not found" });
     }
 
     // Verify reference if provided and belongs to the same project
@@ -44,7 +44,7 @@ export const createMeeting = async (req, res) => {
 
       if (!referenceExists) {
         return res.status(404).json({ 
-          error: `${referenceType} référencé non trouvé ou n'appartient pas au projet` 
+          error: `${referenceType} Reference not found or does not belong to this project.` 
         });
       }
     }
@@ -59,7 +59,7 @@ export const createMeeting = async (req, res) => {
     });
 
     res.status(201).json({
-      message: "Réunion créée avec succès",
+      message: "Meeting created successfully",
       reunion: meeting,
     });
   } catch (error) {
@@ -96,7 +96,7 @@ export const getMeetingById = async (req, res) => {
     const meeting = await MeetingService.getById(id);
 
     if (!meeting) {
-      return res.status(404).json({ error: "Réunion non trouvée" });
+      return res.status(404).json({ error: "Meeting not found" });
     }
 
     res.json(meeting);
@@ -114,18 +114,18 @@ export const updateMeeting = async (req, res) => {
     const meeting = await MeetingService.getById(id);
 
     if (!meeting) {
-      return res.status(404).json({ error: "Réunion non trouvée" });
+      return res.status(404).json({ error: "Meeting not found" });
     }
 
     if (meeting.statut === "Effectuee") {
       return res.status(400).json({ 
-        error: "Impossible de modifier une réunion déjà effectuée" 
+        error: "Cannot modify a meeting that has already been completed." 
       });
     }
 
     if (meeting.statut === "Annulee") {
       return res.status(400).json({ 
-        error: "Impossible de modifier une réunion annulée" 
+        error: "Cannot modify a cancelled meeting." 
       });
     }
 
@@ -156,7 +156,7 @@ export const updateMeeting = async (req, res) => {
 
       if (!referenceExists) {
         return res.status(404).json({ 
-          error: `${referenceType} référencé non trouvé ou n'appartient pas au projet` 
+          error: `${referenceType} Reference not found or does not belong to the project.` 
         });
       }
     }
@@ -170,7 +170,7 @@ export const updateMeeting = async (req, res) => {
     const updatedMeeting = await MeetingService.update(id, updateData);
 
     res.json({
-      message: "Réunion mise à jour avec succès",
+      message: "Meeting updated successfully.",
       reunion: updatedMeeting,
     });
   } catch (error) {
@@ -187,25 +187,25 @@ export const completeMeeting = async (req, res) => {
     const meeting = await MeetingService.getById(id);
 
     if (!meeting) {
-      return res.status(404).json({ error: "Réunion non trouvée" });
+      return res.status(404).json({ error: "Meeting not found" });
     }
 
     if (meeting.statut === "Effectuee") {
       return res.status(400).json({ 
-        error: "Cette réunion est déjà effectuée" 
+        error: "This meeting has already been completed" 
       });
     }
 
     if (meeting.statut === "Annulee") {
       return res.status(400).json({ 
-        error: "Impossible de compléter une réunion annulée" 
+        error: "Impossible to complete a canceled meeting" 
       });
     }
 
     const completedMeeting = await MeetingService.complete(id, compteRendu);
 
     res.json({
-      message: "Réunion complétée avec succès",
+      message: "Meeting completed successfully",
       reunion: completedMeeting,
     });
   } catch (error) {
@@ -221,19 +221,19 @@ export const cancelMeeting = async (req, res) => {
     const meeting = await MeetingService.getById(id);
 
     if (!meeting) {
-      return res.status(404).json({ error: "Réunion non trouvée" });
+      return res.status(404).json({ error: "Meeting not found" });
     }
 
     if (meeting.statut === "Effectuee") {
       return res.status(400).json({ 
-        error: "Impossible d'annuler une réunion déjà effectuée" 
+        error: "Cannot cancel an already completed meeting" 
       });
     }
 
     const cancelledMeeting = await MeetingService.cancel(id);
 
     res.json({
-      message: "Réunion annulée avec succès",
+      message: "Meeting canceled successfully",
       reunion: cancelledMeeting,
     });
   } catch (error) {
@@ -256,12 +256,12 @@ export const validateMeetingContent = async (req, res) => {
     // console.log("Fetched meeting for validation:", meeting);
 
     if (!meeting) {
-      return res.status(404).json({ error: "Réunion non trouvée" });
+      return res.status(404).json({ error: "Meeting noy found" });
     }
 
     if (meeting.statut !== "Effectuee") {
       return res.status(400).json({ 
-        error: "Impossible de valider une réunion non effectuée" 
+        error: "Cannot validate a meeting that has not been completed " 
       });
     }
 
@@ -279,7 +279,7 @@ export const validateMeetingContent = async (req, res) => {
     // console.log("Validation record created:", validation);
 
     res.json({
-      message: "Contenu de la réunion validé avec succès",
+      message: "Meeting content validated successfully.",
       validation,
     });
   } catch (error) {
@@ -295,13 +295,13 @@ export const deleteMeeting = async (req, res) => {
     const meeting = await MeetingService.getById(id);
 
     if (!meeting) {
-      return res.status(404).json({ error: "Réunion non trouvée" });
+      return res.status(404).json({ error: "Meeting not found" });
     }
 
     await MeetingService.deleteById(id);
 
     res.json({
-      message: "Réunion supprimée avec succès",
+      message: "Meeting deleted successfully",
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

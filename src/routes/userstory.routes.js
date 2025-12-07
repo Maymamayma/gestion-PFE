@@ -13,7 +13,9 @@ import {
   createUserStorySchema,
   updateUserStorySchema,
   userStoryParamsSchema, // The generic schema for params validation
+  validateUserStoryDatesWithSprint,
 } from "../validators/userStory.validator.js";
+import { validate } from "uuid";
 
 const router = express.Router();
 
@@ -21,6 +23,7 @@ const router = express.Router();
 router.post(
   "/projects/:projectId/sprints/:sprintId/userStories",
   validateRequest(createUserStorySchema), // Validates body and params
+  validateUserStoryDatesWithSprint,
   loggedMiddleware,
   requireRole("etudiant"),
   createUserStory

@@ -1,77 +1,123 @@
+import { z } from "zod";
 import * as UserStoryService from "../services/userStory.service.js";
+import {
+  createUserStorySchema,
+  updateUserStorySchema,
+  userStoryParamsSchema,
+} from "../validators/userStory.validator.js"; 
+
+// Handles Zod and other errors, sending a structured response
+const handleErrors = (res, error) => {
+  if (error instanceof z.ZodError) {
+    // If it's a Zod validation error, send a 400 with detailed issues
+    return res.status(400).json({ errors: error.flatten().fieldErrors });
+  }
+  // For other errors 
+  console.error(error); // It's good practice to log the actual error on the server
+  return res
+    .status(500)
+    .json({ message: "An internal server error occurred." });
+};
 
 export const createUserStory = async (req, res) => {
   try {
-    const { projectId, sprintId } = req.params;
+    //  Validate request body and params using the Zod schema
+    const { body, params } = createUserStorySchema.parse({
+      body: req.body,
+      params: req.params,
+    });
 
+    //  Call the service with validated and typed data
     const newStory = await UserStoryService.create({
-      ...req.body,
-      projectId,
-      sprintId,
+      ...body,
+      projectId: params.projectId,
+      sprintId: params.sprintId,
     });
 
     res.status(201).json(newStory);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    handleErrors(res, error);
   }
 };
 
 export const listUserStories = async (req, res) => {
   try {
-    const { projectId, sprintId } = req.params;
+    // Validate only the route params
+    const { params } = userStoryParamsSchema.parse({ params: req.params });
 
-    const stories = await UserStoryService.listBySprint(projectId, sprintId);
+    // 2$Call the service
+    const stories = await UserStoryService.listBySprint(
+      params.projectId,
+      params.sprintId
+    );
     res.json(stories);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    handleErrors(res, error);
   }
 };
+
 export const getUserStory = async (req, res) => {
   try {
-    const { userStoryId } = req.params;
-    const story = await UserStoryService.getById(userStoryId);
+    // Validate route params
+    const { params } = userStoryParamsSchema.parse({ params: req.params });
 
-    if (!story) return res.status(404).json({ error: "User story not found" });
+    //  Call the service
+    const story = await UserStoryService.getById(params.userStoryId);
+
+    if (!story) {
+      return res.status(404).json({ message: "User story not found" });
+    }
 
     res.json(story);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    handleErrors(res, error);
   }
 };
+
 export const updateUserStory = async (req, res) => {
   try {
-    const { projectId, sprintId, userStoryId } = req.params;
+    // 1. Validate request body and params
+    const { body, params } = updateUserStorySchema.parse({
+      body: req.body,
+      params: req.params,
+    });
 
-    const updated = await UserStoryService.update(
-      userStoryId,
-      projectId,
-      sprintId,
-      req.body
+    //  Call the service with validated data
+    const updatedStory = await UserStoryService.update(
+      params.userStoryId,
+      params.projectId,
+      params.sprintId,
+      body
     );
 
-    if (!updated)
-      return res.status(404).json({ error: "User story not found" });
+    if (!updatedStory) {
+      return res.status(404).json({ message: "User story not found" });
+    }
 
-    res.json(updated);
+    res.json(updatedStory);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    handleErrors(res, error);
   }
 };
+
 export const deleteUserStory = async (req, res) => {
   try {
-    const { projectId, sprintId, userStoryId } = req.params;
+    //  Validate route params
+    const { params } = userStoryParamsSchema.parse({ params: req.params });
 
-    const deleted = await UserStoryService.remove(
-      userStoryId,
-      projectId,
-      sprintId
+    //  Call the service
+    const deletedStory = await UserStoryService.remove(
+      params.userStoryId,
+      params.projectId,
+      params.sprintId
     );
 
-    if (!deleted)
-      return res.status(404).json({ error: "User story not found" });
+    if (!deletedStory) {
+      return res.status(404).json({ message: "User story not found" });
+    }
 
-    res.json({ message: "User story deleted" });
+    res.status(200).json({ message: "User story deleted successfully" });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    handleErrors(res, error);
   }
 };

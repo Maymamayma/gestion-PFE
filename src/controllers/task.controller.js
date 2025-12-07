@@ -25,7 +25,7 @@ export const createTask = async (req, res) => {
       userStoryId,
       sprintId,
       projectId,
-      createdBy: req.user?.id || "temporary_user_id",
+      createdBy: req.user?._id || "temporary_user_id",
     });
 
     res.status(201).json({
@@ -140,7 +140,7 @@ export const updateTaskStatus = async (req, res) => {
       taskId,
       oldStatus,
       newStatus: status,
-      changedBy: req.user?.id || "temporary_user_id",
+      changedBy: req.user?._id || "temporary_user_id",
       notes,
     });
 

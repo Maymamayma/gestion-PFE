@@ -54,6 +54,9 @@ export const generateProjectReportHTML = (
             .status-inprogress { background: #fff3e0; color: #f57c00; }
             .status-standby { background: #ffebee; color: #c62828; }
             .status-done { background: #e8f5e9; color: #2e7d32; }
+            .status-planned { background: #e3f2fd; color: #1976d2; }
+            .status-active { background: #fff3e0; color: #f57c00; }
+            .status-completed { background: #e8f5e9; color: #2e7d32; }
             .priority { padding: 5px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; display: inline-block; }
             .priority-basse { background: #e0e0e0; color: #616161; }
             .priority-moyenne { background: #fff3e0; color: #f57c00; }
@@ -107,6 +110,57 @@ export const generateProjectReportHTML = (
                 : ""
             }
 
+            <h2>📅 Sprints du projet</h2>
+            ${
+              sprints.length > 0
+                ? `
+            <table>
+              <thead>
+                <tr>
+                  <th>Numéro</th>
+                  <th>Titre</th>
+                  <th>Statut</th>
+                  <th>Période</th>
+                  <th>Tâches</th>
+                  <th>Progression</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${sprints
+                  .map((s) => {
+                    const sprintTasks = allTasks.filter(
+                      (t) => t.sprintId?.toString() === s._id.toString()
+                    );
+                    const sprintDoneTasks = sprintTasks.filter(
+                      (t) => t.status === "Done"
+                    ).length;
+                    const sprintProgress =
+                      sprintTasks.length > 0
+                        ? ((sprintDoneTasks / sprintTasks.length) * 100).toFixed(0)
+                        : 0;
+
+                    return `
+                  <tr>
+                    <td><strong>Sprint ${s.number}</strong></td>
+                    <td>${s.title}</td>
+                    <td><span class="status status-${s.status.toLowerCase()}">${s.status}</span></td>
+                    <td>${new Date(s.start_date).toLocaleDateString("fr-FR")} → ${new Date(s.end_date).toLocaleDateString("fr-FR")}</td>
+                    <td>${sprintTasks.length} tâche(s)</td>
+                    <td>
+                      <div class="progress-container" style="height: 25px; margin: 0;">
+                        <div class="progress-bar" style="width: ${sprintProgress}%; line-height: 25px; font-size: 14px;">${sprintProgress}%</div>
+                      </div>
+                    </td>
+                  </tr>
+                `;
+                  })
+                  .join("")}
+              </tbody>
+            </table>
+            `
+                : "<p>Aucun sprint créé pour ce projet</p>"
+            }
+
             <h2>📋 Toutes les Tâches du Projet</h2>
             <table>
               <thead>
@@ -135,7 +189,10 @@ export const generateProjectReportHTML = (
                     <td><span class="priority priority-${t.priority.toLowerCase()}">${
                             t.priority
                           }</span></td>
-                    <td>${t.sprintId?.title || t.sprintId?.number || "N/A"}</td>
+                    <td>Sprint ${
+                      allTasks.find((task) => task._id.toString() === t._id.toString())
+                        ?.sprintId?.number || "N/A"
+                    }</td>
                   </tr>
                 `
                         )

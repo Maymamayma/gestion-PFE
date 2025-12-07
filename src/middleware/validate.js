@@ -27,27 +27,28 @@ export const validate = (schema) => {
 
       if (error instanceof ZodError) {
         // Formater les erreurs Zod
-        const errors = error.errors?.map((err) => ({
-          field: err.path.join("."),
-          message: err.message,
-          value: err.received,
-          code: err.code,
-        })) || [];
+        const errors =
+          error.errors?.map((err) => ({
+            field: err.path.join("."),
+            message: err.message,
+            value: err.received,
+            code: err.code,
+          })) || [];
 
         console.error("📋 Validation errors:", JSON.stringify(errors, null, 2));
 
         return res.status(400).json({
-          error: "Validation échouée",
+          error: "Validation failed",
           details: errors,
           raw: error.errors,
         });
       }
 
       // Autres erreurs
-      console.error("💥 Non-Zod error:", error);
+      console.error(" Non-Zod error:", error);
       return res.status(500).json({
-        error: "Erreur de validation",
-        message: error?.message || "Erreur inconnue",
+        error: "Validation error",
+        message: error?.message || "Unknown error",
         stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
       });
     }
@@ -69,16 +70,16 @@ export const validateRequest = (schemas) => {
     } catch (error) {
       if (error instanceof ZodError) {
         const errors = error.errors.map((err) => ({
-          field: err.path.join('.'),
+          field: err.path.join("."),
           message: err.message,
         }));
         return res.status(400).json({
-          error: "Validation échouée",
+          error: "Validation failed",
           details: errors,
         });
       }
       return res.status(500).json({
-        error: "Erreur interne de validation",
+        error: "Internal validation error",
         message: error.message,
       });
     }

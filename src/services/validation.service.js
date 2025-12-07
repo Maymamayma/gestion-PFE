@@ -11,5 +11,3 @@ export const listByReunion = (reunionId) =>
   Validation.find({ reunionId })
     .populate("validatedBy", "user_name email")
     .populate("taskId", "title status");
-
-
