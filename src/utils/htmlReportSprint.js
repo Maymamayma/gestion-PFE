@@ -9,7 +9,7 @@ export const generateSprintReportHTML = (sprint, tasks, history) => {
       <html lang="fr">
         <head>
           <meta charset="UTF-8">
-          <title>Rapport Sprint ${sprint.numero || sprint._id}</title>
+          <title>Rapport Sprint ${sprint.number || sprint._id}</title>
           <style>
             body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
             .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
@@ -35,15 +35,15 @@ export const generateSprintReportHTML = (sprint, tasks, history) => {
         </head>
         <body>
           <div class="container">
-            <h1>📊 Rapport Sprint ${sprint.numero || "N/A"}</h1>
-            <p><strong>Nom :</strong> ${sprint.nom || "Sprint"}</p>
+            <h1>📊 Rapport Sprint ${sprint.number || "N/A"}</h1>
+            <p><strong>Nom :</strong> ${sprint.title || "Sprint"}</p>
             <p><strong>Période :</strong> ${
-              sprint.dateDebut
-                ? new Date(sprint.dateDebut).toLocaleDateString("fr-FR")
+              sprint.start_date
+                ? new Date(sprint.start_date).toLocaleDateString("fr-FR")
                 : "N/A"
             } → ${
-    sprint.dateFin
-      ? new Date(sprint.dateFin).toLocaleDateString("fr-FR")
+    sprint.end_date
+      ? new Date(sprint.end_date).toLocaleDateString("fr-FR")
       : "N/A"
   }</p>
 
