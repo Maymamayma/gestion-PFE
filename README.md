@@ -103,21 +103,29 @@ L'équipe D a implémenté le module **Validations & Réunions** du système de 
 
 **3. Endpoints API développés**
 
-*Réunions:*
-- `POST /api/meetings` - Créer une réunion (Étudiant)
-- `GET /api/meetings` - Lister toutes les réunions
-- `GET /api/meetings/upcoming` - Réunions à venir
-- `GET /api/meetings/completed` - Réunions complétées
-- `GET /api/meetings/:id` - Détails d'une réunion
-- `PUT /api/meetings/:id` - Modifier une réunion (Étudiant)
-- `POST /api/meetings/:id/complete` - Compléter une réunion (Étudiant)
-- `POST /api/meetings/:id/validate` - Valider le contenu (Encadrant universitaire)
-- `DELETE /api/meetings/:id` - Supprimer une réunion (Étudiant)
+#### **Endpoints Réunions (Meetings)**
 
-*Validations:*
-- `POST /api/validations/tasks/:taskId/validate` - Valider une tâche (Encadrants)
-- `GET /api/validations/tasks/:taskId/validations` - Validations d'une tâche
-- `GET /api/validations/meetings/:meetingId/validations` - Validations d'une réunion
+| Méthode | Route | Description | Rôle |
+|---------|-------|-------------|------|
+| POST | `/api/meetings` | Créer une réunion avec ordre du jour | Étudiant |
+| GET | `/api/meetings` | Lister toutes les réunions (avec filtre projet optionnel) | Tous |
+| GET | `/api/meetings/upcoming` | Récupérer les réunions à venir (statut Planifiee) | Tous |
+| GET | `/api/meetings/completed` | Récupérer les réunions effectuées (statut Effectuee) | Tous |
+| GET | `/api/meetings/cancelled` | Récupérer les réunions annulées (statut Annulee) | Tous |
+| GET | `/api/meetings/:id` | Récupérer les détails d'une réunion spécifique | Tous |
+| PUT | `/api/meetings/:id` | Modifier une réunion non effectuée | Étudiant |
+| POST | `/api/meetings/:id/complete` | Compléter une réunion avec compte rendu | Étudiant |
+| POST | `/api/meetings/:id/cancel` | Annuler une réunion planifiée | Étudiant |
+| POST | `/api/meetings/:id/validate` | Valider le contenu d'une réunion effectuée | Encadrant universitaire |
+| DELETE | `/api/meetings/:id` | Supprimer une réunion | Étudiant |
+
+#### **Endpoints Validations**
+
+| Méthode | Route | Description | Rôle |
+|---------|-------|-------------|------|
+| POST | `/api/validations/tasks/:taskId/validate` | Valider une tâche (avec réunion optionnelle) | Encadrants |
+| GET | `/api/validations/tasks/:taskId/validations` | Récupérer toutes les validations d'une tâche | Tous |
+| GET | `/api/validations/meetings/:meetingId/validations` | Récupérer les validations liées à une réunion | Tous |
 
 **4. Modèles de données**
 
