@@ -108,7 +108,7 @@ export const validateUserStoryDatesWithSprint = async (req, res, next) => {
 
     if (userStoryEnd < sprintStart || userStoryEnd > sprintEnd) {
       return res.status(400).json({
-        error: "Validation échouée",
+        error: "Validation failed",
         details: [
           {
             field: "end_date",
