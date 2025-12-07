@@ -17,7 +17,7 @@ export const generateDashboard = async (projectId) => {
   const sprints = await Sprint.find({ project_id: projectId }).lean();
 
   //  Load all tasks of the project
-  const tasks = await Task.find({ project_id: projectId }).lean();
+  const tasks = await Task.find({ projectId: projectId }).lean();
 
   //  Task statistics
   const totalTasks = tasks.length;

@@ -1,4 +1,4 @@
-import { Validation } from "../models/validation.model.js";
+import { Validation } from "./models/validation.model.js";
 
 export const create = (data) => Validation.create(data);
 

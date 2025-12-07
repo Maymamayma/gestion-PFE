@@ -38,11 +38,6 @@ const ProjectSchema = new mongoose.Schema(
       required: true, // At least 1 student required
     },
 
-    student_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
-
     company_supervisor_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

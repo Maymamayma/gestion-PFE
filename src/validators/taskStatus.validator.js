@@ -1,17 +1,16 @@
 import { z } from "zod";
 
-// Schéma de validation pour le changement de statut
+// Validation schema for updating task status
 const updateTaskStatusSchema = z.object({
   body: z.object({
     status: z.enum(["ToDo", "InProgress", "Standby", "Done"], {
-      required_error: "Le statut est requis",
-      invalid_type_error:
-        "Le statut doit être : ToDo, InProgress, Standby ou Done",
+      required_error: "Status is required",
+      invalid_type_error: "Status must be one of: ToDo, InProgress, Standby, or Done",
     }),
 
     notes: z
       .string()
-      .max(500, "Les notes ne peuvent pas dépasser 500 caractères")
+      .max(500, "Notes cannot exceed 500 characters")
       .trim()
       .optional(),
   }),
@@ -19,9 +18,9 @@ const updateTaskStatusSchema = z.object({
   params: z.object({
     taskId: z
       .string({
-        required_error: "L'ID de la tâche est requis",
+        required_error: "Task ID is required",
       })
-      .regex(/^[0-9a-fA-F]{24}$/, "ID de tâche invalide"),
+      .regex(/^[0-9a-fA-F]{24}$/, "Invalid task ID"),
   }),
 });
 

@@ -17,7 +17,7 @@ import {
 
 const router = express.Router();
 router.get(
-  "/:id/dashboard",
+  "/:projectId/dashboard",
   loggedMiddleware,
   requireRole("etudiant", "encad_universitaire", "encad_entreprise"),
   getProjectDashboard
@@ -30,24 +30,34 @@ router.get(
   fetchAllProjects
 );
 router.get(
-  "/:id",
+  "/:projectId",
   loggedMiddleware,
   requireRole("etudiant", "encad_universitaire", "encad_entreprise"),
   fetchProjectById
 );
-router.put("/:id", loggedMiddleware, requireRole("etudiant"), updateProject);
-router.delete("/:id", loggedMiddleware, requireRole("etudiant"), deleteProject);
+router.put(
+  "/:projectId",
+  loggedMiddleware,
+  requireRole("etudiant"),
+  updateProject
+);
+router.delete(
+  "/:projectId",
+  loggedMiddleware,
+  requireRole("etudiant"),
+  deleteProject
+);
 
 //---------------------------sprint ---------------------------
 // Create sprint
 router.post(
-  "/:id/sprints",
+  "/:projectId/sprints",
   loggedMiddleware,
   requireRole("etudiant"),
   createSprint
 );
 
 // List all sprints of a project
-router.get("/:id/sprints", loggedMiddleware, getProjectSprints);
+router.get("/:projectId/sprints", loggedMiddleware, getProjectSprints);
 
 export default router;
