@@ -5,28 +5,28 @@ const createMeetingSchema = z.object({
   body: z.object({
     projectId: z
       .string({
-        required_error: "L'ID du projet est requis",
+        required_error: "Project ID is required",
       })
-      .regex(/^[0-9a-fA-F]{24}$/, "ID de projet invalide"),
+      .regex(/^[0-9a-fA-F]{24}$/, "Invalid project ID"),
 
     datePlanification: z
       .string({
-        required_error: "La date de la réunion est requise",
+        required_error: "Meeting date is required",
       })
       .refine((date) => !isNaN(Date.parse(date)), {
-        message: "Format de date invalide",
+        message: "Invalid date format",
       })
       .refine(
         (date) => new Date(date) > new Date(),
-        "La date de la réunion doit être dans le futur"
+        "Please select a meeting date that has not already passed. "
       ),
 
     ordreDuJour: z
       .string({
-        required_error: "L'ordre du jour est requis",
+        required_error: "Agenda is required",
       })
-      .min(10, "L'ordre du jour doit contenir au moins 10 caractères")
-      .max(2000, "L'ordre du jour ne peut pas dépasser 2000 caractères")
+      .min(10, "Agenda must contain at least 10 characters")
+      .max(2000, "Agenda cannot exceed 2000 characters")
       .trim(),
 
     referenceType: z
@@ -36,7 +36,7 @@ const createMeetingSchema = z.object({
 
     referenceId: z
       .string()
-      .regex(/^[0-9a-fA-F]{24}$/, "ID de référence invalide")
+      .regex(/^[0-9a-fA-F]{24}$/, "Invalid reference ID")
       .optional()
       .nullable(),
   }),
@@ -54,8 +54,8 @@ const updateMeetingSchema = z.object({
 
     ordreDuJour: z
       .string()
-      .min(10, "L'ordre du jour doit contenir au moins 10 caractères")
-      .max(2000, "L'ordre du jour ne peut pas dépasser 2000 caractères")
+      .min(10, "Agenda must contain at least 10 characters")
+      .max(2000, "Agenda cannot exceed 2000 characters")
       .trim()
       .optional(),
 
@@ -66,7 +66,7 @@ const updateMeetingSchema = z.object({
 
     referenceId: z
       .string()
-      .regex(/^[0-9a-fA-F]{24}$/, "ID de référence invalide")
+      .regex(/^[0-9a-fA-F]{24}$/, "Invalid reference ID")
       .optional()
       .nullable(),
   }),
@@ -74,9 +74,9 @@ const updateMeetingSchema = z.object({
   params: z.object({
     id: z
       .string({
-        required_error: "L'ID de la réunion est requis",
+        required_error: "Meeting ID is required",
       })
-      .regex(/^[0-9a-fA-F]{24}$/, "ID de réunion invalide"),
+      .regex(/^[0-9a-fA-F]{24}$/, "Meeting ID is Invalid"),
   }),
 });
 
@@ -85,19 +85,19 @@ const completeMeetingSchema = z.object({
   body: z.object({
     compteRendu: z
       .string({
-        required_error: "Le compte rendu est requis",
+        required_error: "Meeting report is required",
       })
-      .min(20, "Le compte rendu doit contenir au moins 20 caractères")
-      .max(5000, "Le compte rendu ne peut pas dépasser 5000 caractères")
+      .min(20, "Meeting report must contain at least 20 characters")
+      .max(5000, "Meeting report cannot exceed 5000 characters")
       .trim(),
   }),
 
   params: z.object({
     id: z
       .string({
-        required_error: "L'ID de la réunion est requis",
+        required_error: "Meeting report is required",
       })
-      .regex(/^[0-9a-fA-F]{24}$/, "ID de réunion invalide"),
+      .regex(/^[0-9a-fA-F]{24}$/, "Invalid meeting ID"),
   }),
 });
 
@@ -105,13 +105,13 @@ const completeMeetingSchema = z.object({
 const validateMeetingContentSchema = z.object({
   body: z.object({
     estValide: z.boolean({
-      required_error: "Le statut de validation est requis",
-      invalid_type_error: "estValide doit être un booléen (true/false)",
+      required_error: "Validation status is required",
+      invalid_type_error: "estValide must be a boolean (true/false)",
     }),
 
     commentaire: z
       .string()
-      .max(1000, "Le commentaire ne peut pas dépasser 1000 caractères")
+      .max(1000, "Comment cannot exceed 1000 characters")
       .trim()
       .optional(),
   }),
@@ -119,9 +119,9 @@ const validateMeetingContentSchema = z.object({
   params: z.object({
     id: z
       .string({
-        required_error: "L'ID de la réunion est requis",
+        required_error: "Meeting ID is required",
       })
-      .regex(/^[0-9a-fA-F]{24}$/, "ID de réunion invalide"),
+      .regex(/^[0-9a-fA-F]{24}$/, "Invalid meeting ID"),
   }),
 });
 
@@ -130,9 +130,9 @@ const meetingIdParamSchema = z.object({
   params: z.object({
     id: z
       .string({
-        required_error: "L'ID de la réunion est requis",
+        required_error: "Meeting ID is required",
       })
-      .regex(/^[0-9a-fA-F]{24}$/, "ID de réunion invalide"),
+      .regex(/^[0-9a-fA-F]{24}$/, "Invalid meeting ID"),
   }),
 });
 
@@ -141,7 +141,7 @@ const projectIdQuerySchema = z.object({
   query: z.object({
     projectId: z
       .string()
-      .regex(/^[0-9a-fA-F]{24}$/, "ID de projet invalide")
+      .regex(/^[0-9a-fA-F]{24}$/, "Invalid project ID")
       .optional(),
   }),
 });
