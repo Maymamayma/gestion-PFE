@@ -3,7 +3,10 @@ import { createVersion } from "../services/report.service.js";
 export const uploadReportVersion = async (req, res) => {
   try {
     const { projectId } = req.params;
-    const { date } = req.body;
+    const { date, version } = req.body;
+    if (!version) {
+      return res.status(400).json({ error: "Version is required" });
+    }
 
     if (!req.file) {
       return res.status(400).json({ error: "PDF file is required" });
@@ -12,6 +15,7 @@ export const uploadReportVersion = async (req, res) => {
     const report = await createVersion(
       projectId,
       date,
+      version,
       req.file.filename,
       req.file.path
     );

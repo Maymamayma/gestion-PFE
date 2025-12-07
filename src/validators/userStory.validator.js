@@ -1,5 +1,6 @@
 import { z } from "zod";
 import mongoose from "mongoose";
+import { Sprint } from "../models/sprint.model.js"; // adjust path
 
 // Function to check for a valid MongoDB ObjectId
 const objectId = z
@@ -61,6 +62,72 @@ export const createUserStorySchema = z.object({
     sprintId: objectId,
   }),
 });
+
+export const validateUserStoryDatesWithSprint = async (req, res, next) => {
+  try {
+    const { sprintId } = req.params;
+    const { start_date, end_date } = req.body;
+
+    // Import Sprint model (adjust path as needed)
+
+    // Fetch sprint
+    const sprint = await Sprint.findById(sprintId);
+
+    if (!sprint) {
+      return res.status(404).json({
+        error: "Sprint not found",
+      });
+    }
+
+    // Parse dates
+    const userStoryStart = new Date(start_date);
+    const userStoryEnd = new Date(end_date);
+    const sprintStart = new Date(sprint.start_date);
+    const sprintEnd = new Date(sprint.end_date);
+
+    // Normalize to remove time component
+    userStoryStart.setHours(0, 0, 0, 0);
+    userStoryEnd.setHours(0, 0, 0, 0);
+    sprintStart.setHours(0, 0, 0, 0);
+    sprintEnd.setHours(0, 0, 0, 0);
+
+    // Validate user story dates are within sprint range
+    if (userStoryStart < sprintStart || userStoryStart > sprintEnd) {
+      return res.status(400).json({
+        error: "Validation échouée",
+        details: [
+          {
+            field: "start_date",
+            message: `User story start date must be within sprint range (${
+              sprint.start_date.toISOString().split("T")[0]
+            } to ${sprint.end_date.toISOString().split("T")[0]}).`,
+          },
+        ],
+      });
+    }
+
+    if (userStoryEnd < sprintStart || userStoryEnd > sprintEnd) {
+      return res.status(400).json({
+        error: "Validation échouée",
+        details: [
+          {
+            field: "end_date",
+            message: `User story end date must be within sprint range (${
+              sprint.start_date.toISOString().split("T")[0]
+            } to ${sprint.end_date.toISOString().split("T")[0]}).`,
+          },
+        ],
+      });
+    }
+
+    next();
+  } catch (error) {
+    return res.status(500).json({
+      error: "Error validating dates against sprint",
+      message: error.message,
+    });
+  }
+};
 
 // Schema for UPDATING a User Story
 export const updateUserStorySchema = z.object({
