@@ -1,10 +1,17 @@
 import { TaskService } from "../services/task.service.js";
 import { TaskHistory } from "../models/TaskHistory.model.js";
+import { Sprint } from "../models/sprint.model.js";
 import { generateSprintReportHTML } from "../utils/htmlReportSprint.js";
 
 export const generateSprintReport = async (req, res) => {
   try {
     const { projectId, sprintId } = req.params;
+
+    // Récupérer le sprint depuis la base de données
+    const sprint = await Sprint.findById(sprintId);
+    if (!sprint) {
+      return res.status(404).json({ error: "Sprint not found" });
+    }
 
     // Récupérer les tâches du sprint
     const tasks = await TaskService.list(projectId, { sprintId });
@@ -15,15 +22,6 @@ export const generateSprintReport = async (req, res) => {
       .sort({ changedAt: -1 })
       .populate("taskId", "title")
       .populate("changedBy", "user_name email");
-
-    // Sprint minimal (à adapter si vous avez le modèle Sprint)
-    const sprint = {
-      _id: sprintId,
-      numero: sprintId,
-      nom: "Sprint",
-      dateDebut: new Date(),
-      dateFin: new Date(),
-    };
 
     // Générer le HTML
     const html = generateSprintReportHTML(sprint, tasks, history);

@@ -1,6 +1,7 @@
 import { TaskService } from "../services/task.service.js";
 import { TaskHistory } from "../models/TaskHistory.model.js";
 import { generateProjectReportHTML } from "../utils/htmlReportProject.js";
+import { Project } from "../models/project.model.js";
 
 export const generateProjectReport = async (req, res) => {
   try {
@@ -16,12 +17,10 @@ export const generateProjectReport = async (req, res) => {
       .populate("taskId", "title")
       .populate("changedBy", "user_name email");
 
-    // Projet minimal (à adapter si vous avez le modèle Project)
-    const project = {
-      _id: projectId,
-      title: "Projet PFE",
-      description: "Suivi complet du projet de fin d'études",
-    };
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ error: "Project not found" });
+    }
 
     // Sprints (vide pour l'instant, à adapter si vous avez le modèle Sprint)
     const sprints = [];
