@@ -1,5 +1,4 @@
-import mongoose from "mongoose";
-import { Project } from "../models/Project.model.js";
+import { Project } from "../models/project.model.js";
 import { generateDashboard } from "../services/project.service.js";
 //---------------------------------------DONE-----------------------
 // Get all projects

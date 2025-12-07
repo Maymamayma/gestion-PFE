@@ -1,15 +1,15 @@
+import { Project } from "../models/project.model.js";
+import { Report } from "../models/report.model.js";
+import { Task } from "../models/task.model.js";
+import { UserStory } from "../models/UserStory.model.js";
 import * as MeetingService from "../services/meeting.service.js";
 import * as ValidationService from "../services/validation.service.js";
-import { Project } from "../models/project.model.js";
-import { UserStory } from "../models/UserStory.model.js";
-import { Task } from "../models/task.model.js";
-import { Report } from "../models/report.model.js";
 
 // Create a new meeting (Student only)
 export const createMeeting = async (req, res) => {
   try {
     const { projectId, datePlanification, ordreDuJour, referenceType, referenceId } = req.body;
-    const userId = req.auth?.id;
+    const userId = req.user?.id;
 
     // Verify project exists
     const project = await Project.findById(projectId);
@@ -17,25 +17,34 @@ export const createMeeting = async (req, res) => {
       return res.status(404).json({ error: "Projet non trouvé" });
     }
 
-    // Verify reference if provided
+    // Verify reference if provided and belongs to the same project
     if (referenceType && referenceId) {
       let referenceExists = false;
       
       switch (referenceType) {
         case "UserStory":
-          referenceExists = await UserStory.findById(referenceId);
+          referenceExists = await UserStory.findOne({ 
+            _id: referenceId, 
+            projectId: projectId 
+          });
           break;
         case "Task":
-          referenceExists = await Task.findById(referenceId);
+          referenceExists = await Task.findOne({ 
+            _id: referenceId, 
+            projectId: projectId 
+          });
           break;
         case "Report":
-          referenceExists = await Report.findById(referenceId);
+          referenceExists = await Report.findOne({ 
+            _id: referenceId, 
+            projectId: projectId 
+          });
           break;
       }
 
       if (!referenceExists) {
         return res.status(404).json({ 
-          error: `${referenceType} référencé non trouvé` 
+          error: `${referenceType} référencé non trouvé ou n'appartient pas au projet` 
         });
       }
     }
@@ -120,25 +129,34 @@ export const updateMeeting = async (req, res) => {
       });
     }
 
-    // Verify reference if provided
+    // Verify reference if provided and belongs to the same project
     if (referenceType && referenceId) {
       let referenceExists = false;
       
       switch (referenceType) {
         case "UserStory":
-          referenceExists = await UserStory.findById(referenceId);
+          referenceExists = await UserStory.findOne({ 
+            _id: referenceId, 
+            projectId: meeting.projectId 
+          });
           break;
         case "Task":
-          referenceExists = await Task.findById(referenceId);
+          referenceExists = await Task.findOne({ 
+            _id: referenceId, 
+            projectId: meeting.projectId 
+          });
           break;
         case "Report":
-          referenceExists = await Report.findById(referenceId);
+          referenceExists = await Report.findOne({ 
+            _id: referenceId, 
+            projectId: meeting.projectId 
+          });
           break;
       }
 
       if (!referenceExists) {
         return res.status(404).json({ 
-          error: `${referenceType} référencé non trouvé` 
+          error: `${referenceType} référencé non trouvé ou n'appartient pas au projet` 
         });
       }
     }
@@ -229,9 +247,13 @@ export const validateMeetingContent = async (req, res) => {
   try {
     const { id } = req.params;
     const { estValide, commentaire } = req.body;
-    const userId = req.auth?.id;
+    const userId = req.user?.id;
+
+    // console.log("Validating meeting content:", { id, estValide, commentaire, userId });
 
     const meeting = await MeetingService.getById(id);
+
+    // console.log("Fetched meeting for validation:", meeting);
 
     if (!meeting) {
       return res.status(404).json({ error: "Réunion non trouvée" });
@@ -243,6 +265,8 @@ export const validateMeetingContent = async (req, res) => {
       });
     }
 
+    // console.log("Creating validation record...");
+
     // Create a validation of type "ContenuReunion"
     const validation = await ValidationService.create({
       reunionId: id,
@@ -251,6 +275,8 @@ export const validateMeetingContent = async (req, res) => {
       typeValidation: "ContenuReunion",
       validatedBy: userId,
     });
+
+    // console.log("Validation record created:", validation);
 
     res.json({
       message: "Contenu de la réunion validé avec succès",

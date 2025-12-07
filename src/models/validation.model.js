@@ -44,14 +44,13 @@ const ValidationSchema = new mongoose.Schema({
 });
 
 // Add validation to ensure correct fields are provided based on type
-ValidationSchema.pre("save", function (next) {
+ValidationSchema.pre("save", async function () {
   if (this.typeValidation === "Tache" && !this.taskId) {
-    return next(new Error("taskId is required for Tache validation"));
+    throw new Error("taskId is required for Tache validation");
   }
   if (this.typeValidation === "ContenuReunion" && !this.reunionId) {
-    return next(new Error("reunionId is required for ContenuReunion validation"));
+    throw new Error("reunionId is required for ContenuReunion validation");
   }
-  next();
 });
 
 export const Validation = mongoose.model("Validation", ValidationSchema);

@@ -1,18 +1,18 @@
-import * as ValidationService from "../services/validation.service.js";
-import { Task } from "../models/task.model.js";
 import { Reunion } from "../models/meeting.model.js";
+import { Task } from "../models/task.model.js";
+import * as ValidationService from "../services/validation.service.js";
 
 export const validateTask = async (req, res) => {
   try {
     const { taskId } = req.params;
-    const { estValide, commentaire, reunionId } = req.body;
+    const { isValid, comment, meetingId } = req.body;
 
     const task = await Task.findById(taskId);
     if (!task) return res.status(404).json({ error: "Tâche non trouvée" });
 
     // Verify meeting exists if provided
-    if (reunionId) {
-      const reunion = await Reunion.findById(reunionId);
+    if (meetingId) {
+      const reunion = await Reunion.findById(meetingId);
       if (!reunion) {
         return res.status(404).json({ error: "Réunion non trouvée" });
       }
@@ -20,11 +20,11 @@ export const validateTask = async (req, res) => {
 
     const validation = await ValidationService.create({
       taskId,
-      estValide,
-      commentaire: commentaire || "",
-      reunionId: reunionId || null,
+      estValide: isValid,
+      commentaire: comment || "",
+      reunionId: meetingId || null,
       typeValidation: "Tache",
-      validatedBy: req.auth?.id,
+      validatedBy: req.user?.id,
     });
 
     res.json({
@@ -51,8 +51,8 @@ export const getTaskValidations = async (req, res) => {
 
 export const getReunionValidations = async (req, res) => {
   try {
-    const { reunionId } = req.params;
-    const validations = await ValidationService.listByReunion(reunionId);
+    const { meetingId } = req.params;
+    const validations = await ValidationService.listByReunion(meetingId);
     res.json({
       count: validations.length,
       validations,

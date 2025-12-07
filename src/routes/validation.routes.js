@@ -1,32 +1,17 @@
 import express from "express";
 import {
-  validateTask,
+  getReunionValidations,
   getTaskValidations,
-  getMeetingValidations,
+  validateTask,
 } from "../controllers/validation.controller.js";
 import { loggedMiddleware as authenticate } from "../middleware/auth.js";
 
-import { validate } from "../middleware/validate.js";
-import { validateTaskSchema, meetingIdParamSchema } from "../validators/validation.validator.js";
-import { taskIdParamSchema } from "../validators/task.validator.js";
 import { requireRole } from "../middleware/roles.js";
+import { validate } from "../middleware/validate.js";
+import { taskIdParamSchema } from "../validators/task.validator.js";
+import { reunionIdParamSchema, validateTaskSchema } from "../validators/validation.validator.js";
 const router = express.Router();
 
-// Middleware personnalisé : Encadrants seulement (entreprise OU universitaire)
-const isSupervisor = (req, res, next) => {
-  if (!req.auth) {
-    return res.status(401).json({ error: "Non authentifié" });
-  }
-
-  const role = req.auth.role;
-  if (role === "encad_entreprise" || role === "encad_universitaire") {
-    next();
-  } else {
-    return res.status(403).json({
-      error: "Accès interdit. Seuls les encadrants peuvent valider les tâches.",
-    });
-  }
-};
 
 // Valider une tâche - ENCADRANTS SEULEMENT
 /**
@@ -85,7 +70,6 @@ router.post(
   "/tasks/:taskId/validate",
   authenticate,
   requireRole("encad_entreprise", "encad_universitaire"),
-
   validate(validateTaskSchema),
   validateTask
 );
@@ -169,8 +153,8 @@ router.get(
 router.get(
   "/meetings/:meetingId/validations",
   authenticate,
-  validate(meetingIdParamSchema),
-  getMeetingValidations
+  validate(reunionIdParamSchema),
+  getReunionValidations
 );
 
 /**

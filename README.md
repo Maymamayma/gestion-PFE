@@ -73,14 +73,14 @@ L'équipe D a implémenté le module **Validations & Réunions** du système de 
 
 * **Aymen Settey** : 
   - Développement du système de réunions (Meeting model, service, controller)
-  - Implémentation des endpoints CRUD pour les réunions
-  - Système de validation du contenu des réunions par l'encadrant universitaire
+  - Intégration des références de réunions dans les validations
+  - Développement des endpoints de validation liés aux réunions
   - Documentation Swagger pour les endpoints de réunions
 
 * **Khairi Hammami** :
-  - Amélioration du système de validation existant
-  - Intégration des références de réunions dans les validations
-  - Développement des endpoints de validation liés aux réunions
+  - Réparation et Amélioration du système de réunions et validation
+  - Implémentation des endpoints CRUD pour les réunions
+  - Système de validation du contenu des réunions par l'encadrant universitaire et professionnel
   - Création de la collection Postman pour les tests
 
 #### **Fonctionnalités implémentées**
