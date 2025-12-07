@@ -14,6 +14,7 @@ import {
   updateUserStorySchema,
   userStoryParamsSchema, // The generic schema for params validation
 } from "../validators/userStory.validator.js";
+import { validate } from "uuid";
 
 const router = express.Router();
 

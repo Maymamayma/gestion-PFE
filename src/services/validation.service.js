@@ -1,4 +1,4 @@
-import { Validation } from "./models/validation.model.js";
+import { Validation } from "../models/validation.model.js";
 
 export const create = (data) => Validation.create(data);
 
@@ -11,5 +11,3 @@ export const listByReunion = (reunionId) =>
   Validation.find({ reunionId })
     .populate("validatedBy", "user_name email")
     .populate("taskId", "title status");
-
-

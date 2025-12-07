@@ -22,19 +22,37 @@ export const createUserStorySchema = z.object({
 
     start_date: z.string().transform((val, ctx) => {
       const date = new Date(val);
+      const now = new Date();
       if (isNaN(date.getTime())) {
         ctx.addIssue({ code: "invalid_date", message: "Invalid start date." });
         return z.NEVER;
       }
+      if (date.getTime() < now.getTime()) {
+        ctx.addIssue({
+          code: "expired_date",
+          message: "Start date cannot be in the past (expired).",
+        });
+        return z.NEVER;
+      }
+
       return date;
     }),
 
     end_date: z.string().transform((val, ctx) => {
       const date = new Date(val);
+      const now = new Date();
       if (isNaN(date.getTime())) {
         ctx.addIssue({ code: "invalid_date", message: "Invalid end date." });
         return z.NEVER;
       }
+      if (date.getTime() < now.getTime()) {
+        ctx.addIssue({
+          code: "expired_date",
+          message: "End date cannot be in the past (expired).",
+        });
+        return z.NEVER;
+      }
+      console.log("End date validated:", date);
       return date;
     }),
   }),
