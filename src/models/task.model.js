@@ -19,7 +19,7 @@ const TaskSchema = new mongoose.Schema({
   },
   priority: {
     type: String,
-    enum: ["Basse", "Moyenne", "Haute"],
+    enum: ["Low", "Medium", "High"],
     required: true,
   },
   userStoryId: {
