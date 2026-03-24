@@ -59,25 +59,38 @@ export const createProject = async (req, res) => {
       start_date,
       end_date,
       students,
-      company_supervisor_id,
-      university_supervisor_id,
+      company_supervisor_email,
+      university_supervisor_email,
     } = req.body;
 
-    if (
-      !title ||
-      !description ||
-      !start_date ||
-      !end_date ||
-      !Array.isArray(students) ||
-      !company_supervisor_id ||
-      !university_supervisor_id
-    ) {
-      return res.status(400).json({
-        error:
-          "All fields (title, description, dates, and user IDs) are required.",
+    // Company Supervisor (optional)
+    if (company_supervisor_email) {
+      const companySupervisor = await User.findOne({
+        email: company_supervisor_email,
       });
+      if (!companySupervisor || companySupervisor.role !== "encad_entreprise") {
+        return res.status(400).json({
+          error:
+            "Invalid company_supervisor_email. User does not exist or is not a company supervisor.",
+        });
+      }
     }
 
+    // University Supervisor (optional)
+    if (university_supervisor_email) {
+      const universitySupervisor = await User.findOne({
+        email: university_supervisor_email,
+      });
+      if (
+        !universitySupervisor ||
+        universitySupervisor.role !== "encad_universitaire"
+      ) {
+        return res.status(400).json({
+          error:
+            "Invalid university_supervisor_email. User does not exist or is not a university supervisor.",
+        });
+      }
+    }
     if (students.length > 2) {
       return res.status(400).json({
         error: "A project can have a maximum of 2 students.",
@@ -111,23 +124,27 @@ export const createProject = async (req, res) => {
     }
 
     // Company Supervisor
-    const companySupervisor = await User.findById(company_supervisor_id);
+    const companySupervisor = await User.findOne({
+      email: company_supervisor_email,
+    });
     if (!companySupervisor || companySupervisor.role !== "encad_entreprise") {
       return res.status(400).json({
         error:
-          "Invalid company_supervisor_id. User does not exist or is not a company supervisor.",
+          "Invalid company_supervisor_email. User does not exist or is not a company supervisor.",
       });
     }
 
     // University Supervisor
-    const universitySupervisor = await User.findById(university_supervisor_id);
+    const universitySupervisor = await User.findOne({
+      email: university_supervisor_email,
+    });
     if (
       !universitySupervisor ||
       universitySupervisor.role !== "encad_universitaire"
     ) {
       return res.status(400).json({
         error:
-          "Invalid university_supervisor_id. User does not exist or is not a university supervisor.",
+          "Invalid university_supervisor_email. User does not exist or is not a university supervisor.",
       });
     }
 
@@ -137,8 +154,8 @@ export const createProject = async (req, res) => {
       start_date,
       end_date,
       students,
-      company_supervisor_id,
-      university_supervisor_id,
+      company_supervisor_email,
+      university_supervisor_email,
     });
 
     const returnedProject = await project.save();
@@ -206,7 +223,7 @@ export const updateProject = async (req, res) => {
       {
         new: true,
         runValidators: true,
-      }
+      },
     )
       .populate("students", "name email role")
       .populate("company_supervisor_id", "name email role")

@@ -20,10 +20,10 @@ export const validate = (schema) => {
         query: req.query,
       });
 
-      // console.log("✅ Validation passed");
+      // console.log(" Validation passed");
       next();
     } catch (error) {
-      console.error("❌ Validation failed:", error);
+      console.error("Validation failed:", error);
 
       if (error instanceof ZodError) {
         // Formater les erreurs Zod
@@ -35,7 +35,7 @@ export const validate = (schema) => {
             code: err.code,
           })) || [];
 
-        console.error("📋 Validation errors:", JSON.stringify(errors, null, 2));
+        console.error("Validation errors:", JSON.stringify(errors, null, 2));
 
         return res.status(400).json({
           error: "Validation failed",

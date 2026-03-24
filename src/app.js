@@ -5,7 +5,6 @@ import swaggerUi from "swagger-ui-express";
 import { globSync } from "glob";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-
 import { router as projectReportRouter } from "./routes/projectReport.routes.js";
 import { router as reportRouter } from "./routes/report.routes.js";
 import { router as reportHistoryRouter } from "./routes/reportHistory.routes.js";
@@ -16,7 +15,6 @@ import { router as validationRouter } from "./routes/validation.routes.js";
 import { router as meetingRouter } from "./routes/meeting.routes.js";
 import projectRoutes from "./routes/project.routes.js";
 import sprinRoutes from "./routes/sprint.routes.js";
-
 import authRoutes from "./routes/auth.routes.js";
 import errorHandler from "./middleware/errorHandler.js";
 
