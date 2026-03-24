@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { Project } from "../models/project.model.js";
 import { User } from "../models/user.model.js";
-
+import { Task } from "../models/task.model.js";
 import { generateDashboard } from "../services/project.service.js";
 //---------------------------------------DONE-----------------------
 // Get all projects
@@ -277,3 +277,50 @@ export const getProjectDashboard = async (req, res) => {
   }
 };
 //---------------------------------------DONE-----------------------
+
+export const getAccountStats = async (req, res) => {
+  try {
+    const userId = req.user._id.toString();
+    const role = req.user.role;
+
+    // 1️⃣ Fetch projects based on role, using lean() to avoid ObjectId cast issues
+    let projectQuery = {};
+    if (role === "etudiant") projectQuery.students = userId;
+    if (role === "encad_universitaire")
+      projectQuery.university_supervisor_id = userId;
+    if (role === "encad_entreprise")
+      projectQuery.company_supervisor_id = userId;
+
+    const projects = await Project.find(projectQuery).lean();
+
+    // 2️⃣ Load all tasks for these projects
+    const projectIds = projects.map((p) => p._id.toString());
+    const tasks = await Task.find({ projectId: { $in: projectIds } }).lean();
+
+    // 3️⃣ Compute stats safely
+    const totalProjects = projects.length;
+    const completedProjects = projects.filter(
+      (p) => p.status === "COMPLETED",
+    ).length;
+    const activeProjects = projects.filter(
+      (p) => !["COMPLETED", "CANCELLED"].includes(p.status),
+    ).length;
+
+    const myTasks = tasks.filter((t) => t.assigneeId === userId).length;
+    const overdueIssues = tasks.filter(
+      (t) => t.due_date && new Date(t.due_date) < new Date(),
+    ).length;
+
+    // 4️⃣ Return stats
+    res.json({
+      totalProjects,
+      activeProjects,
+      completedProjects,
+      myTasks,
+      overdueIssues,
+    });
+  } catch (err) {
+    console.error("Stats fetching error:", err);
+    res.status(500).json({ message: "Server error: " + err.message });
+  }
+};

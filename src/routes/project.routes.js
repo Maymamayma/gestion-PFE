@@ -8,6 +8,7 @@ import {
   deleteProject,
   updateProject,
   getProjectDashboard,
+  getAccountStats,
 } from "../controllers/project.controller.js";
 
 import {
@@ -20,32 +21,39 @@ router.get(
   "/:projectId/dashboard",
   loggedMiddleware,
   requireRole("etudiant", "encad_universitaire", "encad_entreprise"),
-  getProjectDashboard
+  getProjectDashboard,
 );
 router.post("/", loggedMiddleware, requireRole("etudiant"), createProject);
+
+router.get(
+  "/stats",
+  loggedMiddleware,
+  requireRole("etudiant"),
+  getAccountStats,
+);
 router.get(
   "/",
   loggedMiddleware,
   requireRole("etudiant", "encad_universitaire", "encad_entreprise"),
-  fetchAllProjects
+  fetchAllProjects,
 );
 router.get(
   "/:projectId",
   loggedMiddleware,
   requireRole("etudiant", "encad_universitaire", "encad_entreprise"),
-  fetchProjectById
+  fetchProjectById,
 );
 router.put(
   "/:projectId",
   loggedMiddleware,
   requireRole("etudiant"),
-  updateProject
+  updateProject,
 );
 router.delete(
   "/:projectId",
   loggedMiddleware,
   requireRole("etudiant"),
-  deleteProject
+  deleteProject,
 );
 
 //---------------------------sprint ---------------------------
@@ -54,7 +62,7 @@ router.post(
   "/:projectId/sprints",
   loggedMiddleware,
   requireRole("etudiant"),
-  createSprint
+  createSprint,
 );
 
 // List all sprints of a project
