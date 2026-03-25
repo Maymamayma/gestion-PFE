@@ -16,6 +16,7 @@ import { router as meetingRouter } from "./routes/meeting.routes.js";
 import projectRoutes from "./routes/project.routes.js";
 import sprinRoutes from "./routes/sprint.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import userRoutes from "./routes/user.routes.js";
 import errorHandler from "./middleware/errorHandler.js";
 
 const app = express();
@@ -43,6 +44,9 @@ app.use("/api/sprints", sprinRoutes);
 
 //el auth
 app.use("/api/auth", authRoutes);
+
+//routes user
+app.use("/api/users", userRoutes);
 
 //routes project (abir touch it and i ll kill u )
 app.use("/api/projects", projectRoutes);

@@ -46,19 +46,36 @@ const SprintSchema = new mongoose.Schema(
       },
       default: "planned",
     },
+
+    userStories: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "UserStory",
+      },
+    ],
   },
   {
-    timestamps: true, // lili yatase2il hethi ech dir : enables createdAt and updatedAt fil mongo (za7 ken jet tarcha9 dinya 7ad ma yfi9 XD)
-  }
+    timestamps: true, // enables createdAt and updatedAt
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
 );
 
-// project_id + number must be unique
+// project_id + number must be unique within the same project
 SprintSchema.index(
   { project_id: 1, number: 1 },
   {
     unique: true,
-    message: "Sprint number must be unique within the same project",
-  }
+    partialFilterExpression: {
+      project_id: { $exists: true },
+      number: { $exists: true },
+    },
+  },
 );
+
+// Virtual field 'id' for frontend convenience
+SprintSchema.virtual("id").get(function () {
+  return this._id.toHexString();
+});
 
 export const Sprint = mongoose.model("Sprint", SprintSchema);

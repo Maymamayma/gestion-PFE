@@ -32,6 +32,19 @@ export const createSprint = async (req, res) => {
       });
     }
 
+    // Ensure sequential sprint numbering: previous sprint must exist (except for sprint 1)
+    if (number > 1) {
+      const previousSprint = await Sprint.findOne({
+        project_id: projectId,
+        number: number - 1,
+      });
+      if (!previousSprint) {
+        return res.status(400).json({
+          error: `Cannot create sprint ${number}. Sprint ${number - 1} does not exist yet.`,
+        });
+      }
+    }
+
     const sprint = await Sprint.create({
       project_id: projectId,
       number,
@@ -47,6 +60,12 @@ export const createSprint = async (req, res) => {
     });
   } catch (error) {
     console.error("Error creating sprint:", error);
+
+    // Handle validation errors
+    if (error.name === "ValidationError") {
+      const errors = Object.values(error.errors).map((e) => e.message);
+      return res.status(400).json({ error: errors });
+    }
 
     // Handle unique index error
     if (error.code === 11000) {
