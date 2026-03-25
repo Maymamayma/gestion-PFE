@@ -9,6 +9,9 @@ import {
   updateProject,
   getProjectDashboard,
   getAccountStats,
+  addProjectMember,
+  getProjectMembers,
+  removeProjectMember,
 } from "../controllers/project.controller.js";
 
 import {
@@ -54,6 +57,30 @@ router.delete(
   loggedMiddleware,
   requireRole("etudiant"),
   deleteProject,
+);
+
+// Add member to project
+router.post(
+  "/:projectId/members",
+  loggedMiddleware,
+  requireRole("etudiant"),
+  addProjectMember,
+);
+
+// Get project members
+router.get(
+  "/:projectId/members",
+  loggedMiddleware,
+  requireRole("etudiant", "encad_universitaire", "encad_entreprise"),
+  getProjectMembers,
+);
+
+// Remove member from project
+router.delete(
+  "/:projectId/members/:userId",
+  loggedMiddleware,
+  requireRole("etudiant"),
+  removeProjectMember,
 );
 
 //---------------------------sprint ---------------------------

@@ -242,6 +242,119 @@ export const updateProject = async (req, res) => {
   }
 };
 
+// Add a member (student) to a project
+export const addProjectMember = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ error: "userId is required." });
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user || user.role !== "etudiant") {
+      return res
+        .status(400)
+        .json({ error: "User not found or is not a student." });
+    }
+
+    if (project.students.some((id) => id.toString() === userId)) {
+      return res
+        .status(400)
+        .json({ error: "Student is already a member of this project." });
+    }
+
+    if (project.students.length >= 2) {
+      return res
+        .status(400)
+        .json({ error: "A project can have a maximum of 2 students." });
+    }
+
+    project.students.push(userId);
+    await project.save();
+
+    const populated = await Project.findById(projectId).populate(
+      "students",
+      "name email role",
+    );
+
+    res.status(200).json({
+      message: "Member added successfully",
+      project: populated,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Server error: " + err.message });
+  }
+};
+
+// Get project members (students) with count
+export const getProjectMembers = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+
+    const project = await Project.findById(projectId).populate(
+      "students",
+      "name email role",
+    );
+    if (!project) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    res.status(200).json({
+      count: project.students.length,
+      members: project.students,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Server error: " + err.message });
+  }
+};
+
+// Remove a member (student) from a project
+export const removeProjectMember = async (req, res) => {
+  try {
+    const { projectId, userId } = req.params;
+
+    if (req.user._id.toString() === userId) {
+      return res
+        .status(400)
+        .json({ error: "You cannot remove yourself from the project." });
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    const index = project.students.findIndex((id) => id.toString() === userId);
+    if (index === -1) {
+      return res
+        .status(404)
+        .json({ error: "Student is not a member of this project." });
+    }
+
+    project.students.splice(index, 1);
+    await project.save();
+
+    const populated = await Project.findById(projectId).populate(
+      "students",
+      "name email role",
+    );
+
+    res.status(200).json({
+      message: "Member removed successfully",
+      project: populated,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Server error: " + err.message });
+  }
+};
+
 // Delete a project
 export const deleteProject = async (req, res) => {
   try {

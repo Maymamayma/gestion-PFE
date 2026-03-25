@@ -67,6 +67,28 @@ export const updateUser = async (req, res) => {
   }
 };
 
+// SEARCH USER BY EMAIL
+export const searchByEmail = async (req, res) => {
+  try {
+    const { email } = req.query;
+
+    if (!email) {
+      return res
+        .status(400)
+        .json({ error: "Email query parameter is required." });
+    }
+
+    const user = await User.findOne({ email }).select("-password");
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ user });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // GET CURRENT USER
 export const getMe = async (req, res) => {
   try {
