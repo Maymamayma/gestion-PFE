@@ -16,12 +16,18 @@ import { router as meetingRouter } from "./routes/meeting.routes.js";
 import projectRoutes from "./routes/project.routes.js";
 import sprinRoutes from "./routes/sprint.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import userRoutes from "./routes/user.routes.js";
 import errorHandler from "./middleware/errorHandler.js";
 
 const app = express();
 
 // Middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -38,6 +44,9 @@ app.use("/api/sprints", sprinRoutes);
 
 //el auth
 app.use("/api/auth", authRoutes);
+
+//routes user
+app.use("/api/users", userRoutes);
 
 //routes project (abir touch it and i ll kill u )
 app.use("/api/projects", projectRoutes);

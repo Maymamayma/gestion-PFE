@@ -1,6 +1,6 @@
 import { z } from "zod";
 import mongoose from "mongoose";
-import { Sprint } from "../models/sprint.model.js"; 
+import { Sprint } from "../models/sprint.model.js";
 
 // Function to check for a valid MongoDB ObjectId
 const objectId = z
@@ -23,12 +23,15 @@ export const createUserStorySchema = z.object({
 
     start_date: z.string().transform((val, ctx) => {
       const date = new Date(val);
-      const now = new Date();
       if (isNaN(date.getTime())) {
         ctx.addIssue({ code: "invalid_date", message: "Invalid start date." });
         return z.NEVER;
       }
-      if (date.getTime() < now.getTime()) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const dateOnly = new Date(date);
+      dateOnly.setHours(0, 0, 0, 0);
+      if (dateOnly.getTime() < today.getTime()) {
         ctx.addIssue({
           code: "expired_date",
           message: "Start date cannot be in the past (expired).",
@@ -41,12 +44,15 @@ export const createUserStorySchema = z.object({
 
     end_date: z.string().transform((val, ctx) => {
       const date = new Date(val);
-      const now = new Date();
       if (isNaN(date.getTime())) {
         ctx.addIssue({ code: "invalid_date", message: "Invalid end date." });
         return z.NEVER;
       }
-      if (date.getTime() < now.getTime()) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const dateOnly = new Date(date);
+      dateOnly.setHours(0, 0, 0, 0);
+      if (dateOnly.getTime() < today.getTime()) {
         ctx.addIssue({
           code: "expired_date",
           message: "End date cannot be in the past (expired).",
@@ -68,7 +74,6 @@ export const validateUserStoryDatesWithSprint = async (req, res, next) => {
     const { sprintId } = req.params;
     const { start_date, end_date } = req.body;
 
-   
     // Fetch sprint
     const sprint = await Sprint.findById(sprintId);
 

@@ -32,6 +32,19 @@ export const createSprint = async (req, res) => {
       });
     }
 
+    // Ensure sequential sprint numbering: previous sprint must exist (except for sprint 1)
+    if (number > 1) {
+      const previousSprint = await Sprint.findOne({
+        project_id: projectId,
+        number: number - 1,
+      });
+      if (!previousSprint) {
+        return res.status(400).json({
+          error: `Cannot create sprint ${number}. Sprint ${number - 1} does not exist yet.`,
+        });
+      }
+    }
+
     const sprint = await Sprint.create({
       project_id: projectId,
       number,
@@ -47,6 +60,12 @@ export const createSprint = async (req, res) => {
     });
   } catch (error) {
     console.error("Error creating sprint:", error);
+
+    // Handle validation errors
+    if (error.name === "ValidationError") {
+      const errors = Object.values(error.errors).map((e) => e.message);
+      return res.status(400).json({ error: errors });
+    }
 
     // Handle unique index error
     if (error.code === 11000) {
@@ -183,7 +202,17 @@ export const deleteSprint = async (req, res) => {
       return res.status(404).json({ error: "Sprint not found" });
     }
 
-    res.status(200).json({ message: "Sprint deleted successfully" });
+    // Delete all user stories and tasks related to this sprint
+    const userStories = await UserStory.find({ sprintId });
+    const userStoryIds = userStories.map((us) => us._id);
+
+    await Task.deleteMany({ sprintId });
+    await UserStory.deleteMany({ sprintId });
+
+    res.status(200).json({
+      message:
+        "Sprint and its related user stories and tasks deleted successfully",
+    });
   } catch (error) {
     console.error("Error deleting sprint:", error);
     res.status(500).json({ error: "Server error" });

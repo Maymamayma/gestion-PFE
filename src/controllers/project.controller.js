@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { Project } from "../models/project.model.js";
 import { User } from "../models/user.model.js";
-
+import { Task } from "../models/task.model.js";
 import { generateDashboard } from "../services/project.service.js";
 //---------------------------------------DONE-----------------------
 // Get all projects
@@ -237,6 +237,119 @@ export const updateProject = async (req, res) => {
   }
 };
 
+// Add a member (student) to a project
+export const addProjectMember = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const { userId } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ error: "userId is required." });
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user || user.role !== "etudiant") {
+      return res
+        .status(400)
+        .json({ error: "User not found or is not a student." });
+    }
+
+    if (project.students.some((id) => id.toString() === userId)) {
+      return res
+        .status(400)
+        .json({ error: "Student is already a member of this project." });
+    }
+
+    if (project.students.length >= 2) {
+      return res
+        .status(400)
+        .json({ error: "A project can have a maximum of 2 students." });
+    }
+
+    project.students.push(userId);
+    await project.save();
+
+    const populated = await Project.findById(projectId).populate(
+      "students",
+      "name email role",
+    );
+
+    res.status(200).json({
+      message: "Member added successfully",
+      project: populated,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Server error: " + err.message });
+  }
+};
+
+// Get project members (students) with count
+export const getProjectMembers = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+
+    const project = await Project.findById(projectId).populate(
+      "students",
+      "name email role",
+    );
+    if (!project) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    res.status(200).json({
+      count: project.students.length,
+      members: project.students,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Server error: " + err.message });
+  }
+};
+
+// Remove a member (student) from a project
+export const removeProjectMember = async (req, res) => {
+  try {
+    const { projectId, userId } = req.params;
+
+    if (req.user._id.toString() === userId) {
+      return res
+        .status(400)
+        .json({ error: "You cannot remove yourself from the project." });
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    const index = project.students.findIndex((id) => id.toString() === userId);
+    if (index === -1) {
+      return res
+        .status(404)
+        .json({ error: "Student is not a member of this project." });
+    }
+
+    project.students.splice(index, 1);
+    await project.save();
+
+    const populated = await Project.findById(projectId).populate(
+      "students",
+      "name email role",
+    );
+
+    res.status(200).json({
+      message: "Member removed successfully",
+      project: populated,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Server error: " + err.message });
+  }
+};
+
 // Delete a project
 export const deleteProject = async (req, res) => {
   try {
@@ -272,3 +385,50 @@ export const getProjectDashboard = async (req, res) => {
   }
 };
 //---------------------------------------DONE-----------------------
+
+export const getAccountStats = async (req, res) => {
+  try {
+    const userId = req.user._id.toString();
+    const role = req.user.role;
+
+    // 1️⃣ Fetch projects based on role, using lean() to avoid ObjectId cast issues
+    let projectQuery = {};
+    if (role === "etudiant") projectQuery.students = userId;
+    if (role === "encad_universitaire")
+      projectQuery.university_supervisor_id = userId;
+    if (role === "encad_entreprise")
+      projectQuery.company_supervisor_id = userId;
+
+    const projects = await Project.find(projectQuery).lean();
+
+    // 2️⃣ Load all tasks for these projects
+    const projectIds = projects.map((p) => p._id.toString());
+    const tasks = await Task.find({ projectId: { $in: projectIds } }).lean();
+
+    // 3️⃣ Compute stats safely
+    const totalProjects = projects.length;
+    const completedProjects = projects.filter(
+      (p) => p.status === "COMPLETED",
+    ).length;
+    const activeProjects = projects.filter(
+      (p) => !["COMPLETED", "CANCELLED"].includes(p.status),
+    ).length;
+
+    const myTasks = tasks.filter((t) => t.assigneeId === userId).length;
+    const overdueIssues = tasks.filter(
+      (t) => t.due_date && new Date(t.due_date) < new Date(),
+    ).length;
+
+    // 4️⃣ Return stats
+    res.json({
+      totalProjects,
+      activeProjects,
+      completedProjects,
+      myTasks,
+      overdueIssues,
+    });
+  } catch (err) {
+    console.error("Stats fetching error:", err);
+    res.status(500).json({ message: "Server error: " + err.message });
+  }
+};
