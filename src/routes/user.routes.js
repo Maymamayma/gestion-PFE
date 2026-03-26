@@ -6,10 +6,12 @@ import {
   searchByEmail,
 } from "../controllers/user.controller.js";
 
+console.log("updateUser:", typeof updateUser); // should be "function"
+console.log("loggedMiddleware:", typeof loggedMiddleware);
 const router = express.Router();
 
 router.get("/search", loggedMiddleware, searchByEmail);
 router.get("/me", loggedMiddleware, getMe);
-router.put("/me", loggedMiddleware, updateUser);
+router.put("/:id", loggedMiddleware, updateUser);
 
 export default router;

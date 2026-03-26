@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 // UPDATE USER INFO
 export const updateUser = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.params.id || req.user._id;
     const { name, email, password } = req.body;
 
     if (!name && !email && !password) {
@@ -46,12 +46,17 @@ export const updateUser = async (req, res) => {
 
     await user.save();
 
+    console.log("User updated in DB:", user._id, {
+      name: user.name,
+      email: user.email,
+    });
+
     res.status(200).json({
       message: "User updated successfully",
       user: {
-        id: user._id,
-        email: user.email,
+        _id: user._id,
         name: user.name,
+        email: user.email,
         role: user.role,
       },
     });
