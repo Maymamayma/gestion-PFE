@@ -20,6 +20,12 @@ const reunionSchema = new mongoose.Schema(
       maxlength: 2000,
     },
 
+    meeting_URL: {
+      type: String,
+      default: "",
+      maxlength: 2048,
+    },
+
     compteRendu: {
       type: String,
       maxlength: 5000,
@@ -54,6 +60,25 @@ const reunionSchema = new mongoose.Schema(
     dateCreation: {
       type: Date,
       default: Date.now,
+    },
+
+    validation: {
+      estValide: {
+        type: Boolean,
+        default: null,
+      },
+      commentaire: {
+        type: String,
+        default: "",
+      },
+      validePar: {
+        type: String,
+        default: "",
+      },
+      dateValidation: {
+        type: Date,
+        default: null,
+      },
     },
   },
   { timestamps: true }

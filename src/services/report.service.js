@@ -21,3 +21,7 @@ export const createVersion = async (
     version: newVersion,
   });
 };
+
+export const listByProject = async (projectId) => {
+  return Report.find({ projectId }).sort({ createdAt: -1 });
+};

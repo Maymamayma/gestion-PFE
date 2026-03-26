@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+const meetingUrlSchema = z
+  .union([
+    z.string().trim().url("Invalid meeting URL").max(2048, "Meeting URL cannot exceed 2048 characters"),
+    z.literal(""),
+    z.null(),
+  ])
+  .optional();
+
 // Schema for creating a meeting
 const createMeetingSchema = z.object({
   body: z.object({
@@ -29,6 +37,8 @@ const createMeetingSchema = z.object({
       .max(2000, "Agenda cannot exceed 2000 characters")
       .trim(),
 
+    meeting_URL: meetingUrlSchema,
+
     referenceType: z
       .enum(["UserStory", "Task", "Report"])
       .optional()
@@ -39,6 +49,17 @@ const createMeetingSchema = z.object({
       .regex(/^[0-9a-fA-F]{24}$/, "Invalid reference ID")
       .optional()
       .nullable(),
+  }).superRefine((data, ctx) => {
+    const hasReferenceType = Boolean(data.referenceType);
+    const hasReferenceId = Boolean(data.referenceId);
+
+    if (hasReferenceType !== hasReferenceId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "referenceType and referenceId must be provided together",
+        path: hasReferenceType ? ["referenceId"] : ["referenceType"],
+      });
+    }
   }),
 });
 
@@ -59,6 +80,8 @@ const updateMeetingSchema = z.object({
       .trim()
       .optional(),
 
+    meeting_URL: meetingUrlSchema,
+
     referenceType: z
       .enum(["UserStory", "Task", "Report"])
       .optional()
@@ -69,6 +92,17 @@ const updateMeetingSchema = z.object({
       .regex(/^[0-9a-fA-F]{24}$/, "Invalid reference ID")
       .optional()
       .nullable(),
+  }).superRefine((data, ctx) => {
+    const hasReferenceType = Boolean(data.referenceType);
+    const hasReferenceId = Boolean(data.referenceId);
+
+    if (hasReferenceType !== hasReferenceId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "referenceType and referenceId must be provided together",
+        path: hasReferenceType ? ["referenceId"] : ["referenceType"],
+      });
+    }
   }),
 
   params: z.object({
