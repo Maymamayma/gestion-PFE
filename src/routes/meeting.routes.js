@@ -53,13 +53,10 @@ const router = express.Router();
  *               ordreDuJour:
  *                 type: string
  *                 example: "Discussion sur l'avancement du sprint 1"
-<<<<<<< HEAD
-=======
  *               meeting_URL:
  *                 type: string
  *                 format: uri
  *                 example: "https://meet.google.com/abc-defg-hij"
->>>>>>> origin/feature/meetings
  *               referenceType:
  *                 type: string
  *                 enum: [UserStory, Task, Report]
@@ -277,12 +274,9 @@ router.get(
  *                 format: date-time
  *               ordreDuJour:
  *                 type: string
-<<<<<<< HEAD
-=======
  *               meeting_URL:
  *                 type: string
  *                 format: uri
->>>>>>> origin/feature/meetings
  *               referenceType:
  *                 type: string
  *                 enum: [UserStory, Task, Report]
