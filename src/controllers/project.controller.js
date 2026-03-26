@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import { Project } from "../models/project.model.js";
 import { User } from "../models/user.model.js";
 import { Task } from "../models/task.model.js";
+import { Sprint } from "../models/sprint.model.js";
+import { UserStory } from "../models/UserStory.model.js";
 import { generateDashboard } from "../services/project.service.js";
 //---------------------------------------DONE-----------------------
 // Get all projects
@@ -359,9 +361,16 @@ export const deleteProject = async (req, res) => {
       return res.status(404).json({ message: "Project not found" });
     }
 
+    const projectId = project._id;
+
+    // Delete all related tasks, user stories, and sprints
+    await Task.deleteMany({ projectId });
+    await UserStory.deleteMany({ projectId });
+    await Sprint.deleteMany({ project_id: projectId });
+
     await project.deleteOne();
 
-    res.json({ message: "Project deleted successfully" });
+    res.json({ message: "Project and all related data deleted successfully" });
   } catch (err) {
     res.status(500).json({ message: "Server error: " + err.message });
   }

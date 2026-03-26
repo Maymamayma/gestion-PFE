@@ -1,55 +1,31 @@
 import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
 
-// UPDATE USER INFO
+// UPDATE USER NAME
 export const updateUser = async (req, res) => {
   try {
     const userId = req.params.id || req.user._id;
-    const { name, email, password } = req.body;
+    const { name } = req.body;
 
-    if (!name && !email && !password) {
-      return res
-        .status(400)
-        .json({ error: "At least one field is required to update." });
+    if (!name) {
+      return res.status(400).json({ error: "Name is required." });
     }
 
-    const user = await User.findById(userId);
+    if (name.length < 3 || name.length > 50) {
+      return res
+        .status(400)
+        .json({ error: "Name must be between 3 and 50 characters." });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { name, updatedAt: Date.now() },
+      { new: true, runValidators: true },
+    ).select("-password");
+
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-
-    if (email && email !== user.email) {
-      const exists = await User.findOne({ email });
-      if (exists) {
-        return res.status(400).json({ error: "Email already used" });
-      }
-      user.email = email;
-    }
-
-    if (name) {
-      user.name = name;
-    }
-
-    if (password) {
-      user.password = password;
-    }
-
-    user.updatedAt = Date.now();
-
-    const validationError = user.validateSync();
-    if (validationError) {
-      const errors = Object.values(validationError.errors).map(
-        (e) => e.message,
-      );
-      return res.status(400).json({ error: errors });
-    }
-
-    await user.save();
-
-    console.log("User updated in DB:", user._id, {
-      name: user.name,
-      email: user.email,
-    });
 
     res.status(200).json({
       message: "User updated successfully",
@@ -65,9 +41,7 @@ export const updateUser = async (req, res) => {
       const errors = Object.values(err.errors).map((e) => e.message);
       return res.status(400).json({ error: errors });
     }
-    if (err.code === 11000) {
-      return res.status(400).json({ error: "Email already used" });
-    }
+
     res.status(500).json({ error: err.message });
   }
 };
