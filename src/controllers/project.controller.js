@@ -2,9 +2,30 @@ import mongoose from "mongoose";
 import { Project } from "../models/project.model.js";
 import { User } from "../models/user.model.js";
 import { Task } from "../models/task.model.js";
-import { Sprint } from "../models/sprint.model.js";
-import { UserStory } from "../models/UserStory.model.js";
 import { generateDashboard } from "../services/project.service.js";
+
+const findStudentsAlreadyAssignedToOtherProjects = async (
+  studentIds,
+  excludeProjectId = null,
+) => {
+  if (!studentIds?.length) return [];
+
+  const query = { students: { $in: studentIds } };
+  if (excludeProjectId) {
+    query._id = { $ne: excludeProjectId };
+  }
+
+  const existingProjects = await Project.find(query).select("students");
+  const assignedStudentIds = new Set(
+    existingProjects.flatMap((project) =>
+      project.students.map((studentId) => studentId.toString()),
+    ),
+  );
+
+  return studentIds.filter((studentId) =>
+    assignedStudentIds.has(studentId.toString()),
+  );
+};
 //---------------------------------------DONE-----------------------
 // Get all projects
 export const fetchAllProjects = async (req, res) => {
@@ -101,10 +122,30 @@ export const createProject = async (req, res) => {
       });
     }
 
+    const creatorAlreadyHasProject = await Project.exists({
+      students: req.user._id,
+    });
+    if (creatorAlreadyHasProject) {
+      return res.status(400).json({
+        error: "A student can create at most one project.",
+      });
+    }
+
     const uniqueStudents = new Set(students);
     if (uniqueStudents.size !== students.length) {
       return res.status(400).json({
         error: "Duplicate student IDs are not allowed.",
+      });
+    }
+
+    const studentsAlreadyAssigned = await findStudentsAlreadyAssignedToOtherProjects(
+      students,
+    );
+    if (studentsAlreadyAssigned.length > 0) {
+      return res.status(400).json({
+        error:
+          "Each student can belong to only one project. One or more selected students are already assigned.",
+        studentIds: studentsAlreadyAssigned,
       });
     }
     // hethi bech ttchecki date ta3 endate cuz cant be in the past
@@ -214,6 +255,44 @@ export const updateProject = async (req, res) => {
         });
       }
     }
+
+    if (Array.isArray(req.body.students)) {
+      if (req.body.students.length > 2) {
+        return res.status(400).json({
+          error: "A project can have a maximum of 2 students.",
+        });
+      }
+
+      const uniqueStudents = new Set(req.body.students);
+      if (uniqueStudents.size !== req.body.students.length) {
+        return res.status(400).json({
+          error: "Duplicate student IDs are not allowed.",
+        });
+      }
+
+      for (const studentId of req.body.students) {
+        const student = await User.findById(studentId);
+        if (!student || student.role !== "etudiant") {
+          return res.status(400).json({
+            error: `Invalid student ID '${studentId}'. User not found or not a student.`,
+          });
+        }
+      }
+
+      const studentsAlreadyAssigned =
+        await findStudentsAlreadyAssignedToOtherProjects(
+          req.body.students,
+          req.params.projectId,
+        );
+      if (studentsAlreadyAssigned.length > 0) {
+        return res.status(400).json({
+          error:
+            "Each student can belong to only one project. One or more selected students are already assigned.",
+          studentIds: studentsAlreadyAssigned,
+        });
+      }
+    }
+
     const updated = await Project.findByIdAndUpdate(
       req.params.projectId,
       req.body,
@@ -271,6 +350,16 @@ export const addProjectMember = async (req, res) => {
       return res
         .status(400)
         .json({ error: "A project can have a maximum of 2 students." });
+    }
+
+    const studentAlreadyInAnotherProject = await Project.exists({
+      _id: { $ne: projectId },
+      students: userId,
+    });
+    if (studentAlreadyInAnotherProject) {
+      return res.status(400).json({
+        error: "This student is already assigned to another project.",
+      });
     }
 
     project.students.push(userId);
@@ -406,16 +495,9 @@ export const deleteProject = async (req, res) => {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    const projectId = project._id;
-
-    // Delete all related tasks, user stories, and sprints
-    await Task.deleteMany({ projectId });
-    await UserStory.deleteMany({ projectId });
-    await Sprint.deleteMany({ project_id: projectId });
-
     await project.deleteOne();
 
-    res.json({ message: "Project and all related data deleted successfully" });
+    res.json({ message: "Project deleted successfully" });
   } catch (err) {
     res.status(500).json({ message: "Server error: " + err.message });
   }

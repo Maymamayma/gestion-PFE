@@ -1,4 +1,4 @@
-import { createVersion } from "../services/report.service.js";
+import { createVersion, listByProject } from "../services/report.service.js";
 
 export const uploadReportVersion = async (req, res) => {
   try {
@@ -23,6 +23,20 @@ export const uploadReportVersion = async (req, res) => {
     res.status(201).json({
       message: "Report version uploaded successfully",
       report,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const listReportsByProject = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const reports = await listByProject(projectId);
+
+    res.json({
+      count: reports.length,
+      reports,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

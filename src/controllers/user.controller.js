@@ -27,12 +27,40 @@ export const updateUser = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
+    if (email && email !== user.email) {
+      const exists = await User.findOne({ email });
+      if (exists) {
+        return res.status(400).json({ error: "Email already used" });
+      }
+      user.email = email;
+    }
+
+    if (name) {
+      user.name = name;
+    }
+
+    if (password) {
+      user.password = password;
+    }
+
+    user.updatedAt = Date.now();
+
+    const validationError = user.validateSync();
+    if (validationError) {
+      const errors = Object.values(validationError.errors).map(
+        (e) => e.message,
+      );
+      return res.status(400).json({ error: errors });
+    }
+
+    await user.save();
+
     res.status(200).json({
       message: "User updated successfully",
       user: {
-        _id: user._id,
-        name: user.name,
+        id: user._id,
         email: user.email,
+        name: user.name,
         role: user.role,
       },
     });
@@ -41,7 +69,9 @@ export const updateUser = async (req, res) => {
       const errors = Object.values(err.errors).map((e) => e.message);
       return res.status(400).json({ error: errors });
     }
-
+    if (err.code === 11000) {
+      return res.status(400).json({ error: "Email already used" });
+    }
     res.status(500).json({ error: err.message });
   }
 };

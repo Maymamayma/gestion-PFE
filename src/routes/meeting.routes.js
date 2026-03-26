@@ -53,6 +53,10 @@ const router = express.Router();
  *               ordreDuJour:
  *                 type: string
  *                 example: "Discussion sur l'avancement du sprint 1"
+ *               meeting_URL:
+ *                 type: string
+ *                 format: uri
+ *                 example: "https://meet.google.com/abc-defg-hij"
  *               referenceType:
  *                 type: string
  *                 enum: [UserStory, Task, Report]
@@ -270,6 +274,9 @@ router.get(
  *                 format: date-time
  *               ordreDuJour:
  *                 type: string
+ *               meeting_URL:
+ *                 type: string
+ *                 format: uri
  *               referenceType:
  *                 type: string
  *                 enum: [UserStory, Task, Report]
@@ -386,13 +393,13 @@ router.post(
   cancelMeeting
 );
 
-// Validate meeting content (University supervisor only)
+// Validate meeting content (Supervisors only)
 /**
  * @swagger
  * /api/meetings/{id}/validate:
  *   post:
  *     summary: Valider le contenu d'une réunion
- *     description: Permet à un encadrant universitaire de valider le compte rendu d'une réunion
+ *     description: Permet à un encadrant universitaire ou entreprise de valider le compte rendu d'une réunion
  *     tags: [Meetings]
  *     security:
  *       - bearerAuth: []
@@ -425,7 +432,7 @@ router.post(
  *       401:
  *         description: Non authentifié
  *       403:
- *         description: Non autorisé (pas encadrant universitaire)
+ *         description: Non autorisé (pas encadrant)
  *       404:
  *         description: Réunion non trouvée
  *       500:
@@ -434,7 +441,7 @@ router.post(
 router.post(
   "/:id/validate",
   authenticate,
-  requireRole("encad_universitaire"),
+  requireRole("encad_universitaire", "encad_entreprise"),
   validate(validateMeetingContentSchema),
   validateMeetingContent
 );

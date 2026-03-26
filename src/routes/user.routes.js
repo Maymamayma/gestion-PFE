@@ -7,8 +7,6 @@ import {
   changePassword,
 } from "../controllers/user.controller.js";
 
-console.log("updateUser:", typeof updateUser); // should be "function"
-console.log("loggedMiddleware:", typeof loggedMiddleware);
 const router = express.Router();
 
 router.get("/search", loggedMiddleware, searchByEmail);

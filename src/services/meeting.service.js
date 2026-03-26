@@ -9,7 +9,8 @@ export const create = async (data) => {
 export const getAll = async (filters = {}) => {
   return await Reunion.find(filters)
     .populate("projectId", "title description")
-    .populate("createdBy", "user_name email")
+    .populate("createdBy", "name email")
+    .populate("referenceId")
     .sort({ datePlanification: -1 });
 };
 
@@ -17,7 +18,7 @@ export const getAll = async (filters = {}) => {
 export const getById = async (id) => {
   return await Reunion.findById(id)
     .populate("projectId", "title description")
-    .populate("createdBy", "user_name email")
+    .populate("createdBy", "name email")
     .populate("referenceId");
 };
 
@@ -28,7 +29,8 @@ export const update = async (id, data) => {
     runValidators: true,
   })
     .populate("projectId", "title description")
-    .populate("createdBy", "user_name email");
+    .populate("createdBy", "name email")
+    .populate("referenceId");
 };
 
 // Complete meeting with actual report
@@ -45,7 +47,8 @@ export const complete = async (id, compteRendu) => {
     }
   )
     .populate("projectId", "title description")
-    .populate("createdBy", "user_name email");
+    .populate("createdBy", "name email")
+    .populate("referenceId");
 };
 
 // Cancel meeting
@@ -61,7 +64,8 @@ export const cancel = async (id) => {
     }
   )
     .populate("projectId", "title description")
-    .populate("createdBy", "user_name email");
+    .populate("createdBy", "name email")
+    .populate("referenceId");
 };
 
 // Delete meeting
@@ -72,7 +76,8 @@ export const deleteById = async (id) => {
 // Get meetings by project
 export const getByProject = async (projectId) => {
   return await Reunion.find({ projectId })
-    .populate("createdBy", "user_name email")
+    .populate("createdBy", "name email")
+    .populate("referenceId")
     .sort({ datePlanification: -1 });
 };
 
@@ -89,7 +94,8 @@ export const getUpcoming = async (projectId = null) => {
 
   return await Reunion.find(filter)
     .populate("projectId", "title description")
-    .populate("createdBy", "user_name email")
+    .populate("createdBy", "name email")
+    .populate("referenceId")
     .sort({ datePlanification: 1 });
 };
 
@@ -103,7 +109,8 @@ export const getCompleted = async (projectId = null) => {
 
   return await Reunion.find(filter)
     .populate("projectId", "title description")
-    .populate("createdBy", "user_name email")
+    .populate("createdBy", "name email")
+    .populate("referenceId")
     .sort({ datePlanification: -1 });
 };
 
@@ -117,7 +124,8 @@ export const getCancelled = async (projectId = null) => {
 
   return await Reunion.find(filter)
     .populate("projectId", "title description")
-    .populate("createdBy", "user_name email")
+    .populate("createdBy", "name email")
+    .populate("referenceId")
     .sort({ datePlanification: -1 });
 };
 

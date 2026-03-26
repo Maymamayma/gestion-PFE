@@ -7,7 +7,7 @@ export const listHistory = async (req, res) => {
     const reports = await ReportHistoryService.listReports(projectId);
 
     if (!reports || reports.length === 0) {
-      return res.status(200).json({ error: "No reports found" });
+      return res.status(404).json({ error: "No reports found" });
     }
 
     res.json(reports);

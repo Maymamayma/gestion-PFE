@@ -5,11 +5,71 @@ import { UserStory } from "../models/UserStory.model.js";
 import * as MeetingService from "../services/meeting.service.js";
 import * as ValidationService from "../services/validation.service.js";
 
+const EMPTY_PROJECT_FILTER = { $in: [] };
+
+const normalizeMeetingUrl = (value) => {
+  if (value === undefined || value === null) {
+    return "";
+  }
+
+  const normalizedValue = typeof value === "string" ? value.trim() : "";
+  return normalizedValue;
+};
+
+const buildProjectAccessFilter = async (user, requestedProjectId) => {
+  const userId = user?._id ?? user?.id;
+
+  if (!userId || !user?.role) {
+    return EMPTY_PROJECT_FILTER;
+  }
+
+  if (user.role === "admin") {
+    return requestedProjectId || null;
+  }
+
+  const projectQueryByRole = {
+    etudiant: { students: userId },
+    encad_universitaire: { university_supervisor_id: userId },
+    encad_entreprise: { company_supervisor_id: userId },
+  };
+
+  const roleProjectQuery = projectQueryByRole[user.role];
+  if (!roleProjectQuery) {
+    return EMPTY_PROJECT_FILTER;
+  }
+
+  const projects = await Project.find(roleProjectQuery).select("_id");
+  const allowedProjectIds = projects.map((project) => String(project._id));
+
+  if (requestedProjectId) {
+    return allowedProjectIds.includes(String(requestedProjectId))
+      ? requestedProjectId
+      : EMPTY_PROJECT_FILTER;
+  }
+
+  return { $in: allowedProjectIds };
+};
+
 // Create a new meeting (Student only)
 export const createMeeting = async (req, res) => {
   try {
-    const { projectId, datePlanification, ordreDuJour, referenceType, referenceId } = req.body;
+    const {
+      projectId,
+      datePlanification,
+      ordreDuJour,
+      meeting_URL,
+      referenceType,
+      referenceId,
+    } = req.body;
     const userId = req.user?.id;
+    const hasReferenceType = Boolean(referenceType);
+    const hasReferenceId = Boolean(referenceId);
+
+    if (hasReferenceType !== hasReferenceId) {
+      return res.status(400).json({
+        error: "referenceType and referenceId must be provided together.",
+      });
+    }
 
     // Verify project exists
     const project = await Project.findById(projectId);
@@ -53,6 +113,7 @@ export const createMeeting = async (req, res) => {
       projectId,
       datePlanification,
       ordreDuJour,
+      meeting_URL: normalizeMeetingUrl(meeting_URL),
       referenceType: referenceType || null,
       referenceId: referenceId || null,
       createdBy: userId,
@@ -73,9 +134,8 @@ export const getAllMeetings = async (req, res) => {
     const { projectId } = req.query;
     const filters = {};
 
-    if (projectId) {
-      filters.projectId = projectId;
-    }
+    const projectFilter = await buildProjectAccessFilter(req.user, projectId);
+    if (projectFilter) filters.projectId = projectFilter;
 
     const meetings = await MeetingService.getAll(filters);
 
@@ -109,7 +169,16 @@ export const getMeetingById = async (req, res) => {
 export const updateMeeting = async (req, res) => {
   try {
     const { id } = req.params;
-    const { datePlanification, ordreDuJour, referenceType, referenceId } = req.body;
+    const { datePlanification, ordreDuJour, meeting_URL, referenceType, referenceId } =
+      req.body;
+    const hasReferenceType = Boolean(referenceType);
+    const hasReferenceId = Boolean(referenceId);
+
+    if (hasReferenceType !== hasReferenceId) {
+      return res.status(400).json({
+        error: "referenceType and referenceId must be provided together.",
+      });
+    }
 
     const meeting = await MeetingService.getById(id);
 
@@ -164,6 +233,7 @@ export const updateMeeting = async (req, res) => {
     const updateData = {};
     if (datePlanification) updateData.datePlanification = datePlanification;
     if (ordreDuJour) updateData.ordreDuJour = ordreDuJour;
+    if (meeting_URL !== undefined) updateData.meeting_URL = normalizeMeetingUrl(meeting_URL);
     if (referenceType !== undefined) updateData.referenceType = referenceType || null;
     if (referenceId !== undefined) updateData.referenceId = referenceId || null;
 
@@ -265,6 +335,12 @@ export const validateMeetingContent = async (req, res) => {
       });
     }
 
+    if (meeting.validation?.dateValidation) {
+      return res.status(400).json({
+        error: "This meeting report has already been validated.",
+      });
+    }
+
     // console.log("Creating validation record...");
 
     // Create a validation of type "ContenuReunion"
@@ -276,11 +352,21 @@ export const validateMeetingContent = async (req, res) => {
       validatedBy: userId,
     });
 
+    const updatedMeeting = await MeetingService.update(id, {
+      validation: {
+        estValide,
+        commentaire: commentaire || "",
+        validePar: String(userId || ""),
+        dateValidation: new Date(),
+      },
+    });
+
     // console.log("Validation record created:", validation);
 
     res.json({
       message: "Meeting content validated successfully.",
       validation,
+      reunion: updatedMeeting,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -312,7 +398,8 @@ export const deleteMeeting = async (req, res) => {
 export const getUpcomingMeetings = async (req, res) => {
   try {
     const { projectId } = req.query;
-    const meetings = await MeetingService.getUpcoming(projectId || null);
+    const projectFilter = await buildProjectAccessFilter(req.user, projectId);
+    const meetings = await MeetingService.getUpcoming(projectFilter || null);
 
     res.json({
       count: meetings.length,
@@ -327,7 +414,8 @@ export const getUpcomingMeetings = async (req, res) => {
 export const getCompletedMeetings = async (req, res) => {
   try {
     const { projectId } = req.query;
-    const meetings = await MeetingService.getCompleted(projectId || null);
+    const projectFilter = await buildProjectAccessFilter(req.user, projectId);
+    const meetings = await MeetingService.getCompleted(projectFilter || null);
 
     res.json({
       count: meetings.length,
@@ -342,7 +430,8 @@ export const getCompletedMeetings = async (req, res) => {
 export const getCancelledMeetings = async (req, res) => {
   try {
     const { projectId } = req.query;
-    const meetings = await MeetingService.getCancelled(projectId || null);
+    const projectFilter = await buildProjectAccessFilter(req.user, projectId);
+    const meetings = await MeetingService.getCancelled(projectFilter || null);
 
     res.json({
       count: meetings.length,
