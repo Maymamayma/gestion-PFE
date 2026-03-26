@@ -352,6 +352,51 @@ export const removeProjectMember = async (req, res) => {
   }
 };
 
+// Add university supervisor to a project
+export const addUniversitySupervisor = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: "Email is required." });
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ error: "Project not found" });
+    }
+
+    if (project.university_supervisor_id) {
+      return res
+        .status(400)
+        .json({ error: "Project already has a university supervisor." });
+    }
+
+    const supervisor = await User.findOne({ email });
+    if (!supervisor || supervisor.role !== "encad_universitaire") {
+      return res
+        .status(400)
+        .json({ error: "User not found or is not a university supervisor." });
+    }
+
+    project.university_supervisor_id = supervisor._id;
+    await project.save();
+
+    const populated = await Project.findById(projectId)
+      .populate("students", "name email role")
+      .populate("university_supervisor_id", "name email role")
+      .populate("company_supervisor_id", "name email role");
+
+    res.status(200).json({
+      message: "University supervisor added successfully",
+      project: populated,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Server error: " + err.message });
+  }
+};
+
 // Delete a project
 export const deleteProject = async (req, res) => {
   try {

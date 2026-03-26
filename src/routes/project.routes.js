@@ -12,6 +12,7 @@ import {
   addProjectMember,
   getProjectMembers,
   removeProjectMember,
+  addUniversitySupervisor,
 } from "../controllers/project.controller.js";
 
 import {
@@ -21,7 +22,10 @@ import {
 
 import upload from "../middleware/uploadReport.js";
 import { uploadReportVersion } from "../controllers/report.controller.js";
-import { listHistory, downloadReport } from "../controllers/reportHistory.controller.js";
+import {
+  listHistory,
+  downloadReport,
+} from "../controllers/reportHistory.controller.js";
 
 const router = express.Router();
 router.get(
@@ -87,6 +91,14 @@ router.delete(
   removeProjectMember,
 );
 
+// Add university supervisor
+router.post(
+  "/:projectId/university-supervisor",
+  loggedMiddleware,
+  requireRole("etudiant"),
+  addUniversitySupervisor,
+);
+
 //---------------------------sprint ---------------------------
 // Create sprint
 router.post(
@@ -105,21 +117,21 @@ router.post(
   loggedMiddleware,
   requireRole("etudiant"),
   upload.single("pdf"),
-  uploadReportVersion
+  uploadReportVersion,
 );
 
 router.get(
   "/:projectId/reports",
   loggedMiddleware,
   requireRole("etudiant", "encad_universitaire"),
-  listHistory
+  listHistory,
 );
 
 router.get(
   "/:projectId/reports/:reportId/download",
   loggedMiddleware,
   requireRole("etudiant", "encad_universitaire"),
-  downloadReport
+  downloadReport,
 );
 
 export default router;

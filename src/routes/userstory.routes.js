@@ -26,7 +26,7 @@ router.post(
   validateUserStoryDatesWithSprint,
   loggedMiddleware,
   requireRole("etudiant"),
-  createUserStory
+  createUserStory,
 );
 
 // LIST all user stories for a sprint
@@ -34,8 +34,8 @@ router.get(
   "/projects/:projectId/sprints/:sprintId/userStories",
   validateRequest(userStoryParamsSchema), // Validates projectId and sprintId
   loggedMiddleware,
-  requireRole("etudiant"),
-  listUserStories
+  requireRole("etudiant", "encad_universitaire"),
+  listUserStories,
 );
 
 // GET a single user story by id
@@ -44,7 +44,7 @@ router.get(
   validateRequest(userStoryParamsSchema), // Validates all three IDs
   loggedMiddleware,
   requireRole("etudiant"),
-  getUserStory
+  getUserStory,
 );
 
 // UPDATE a user story by id
@@ -53,7 +53,7 @@ router.put(
   validateRequest(updateUserStorySchema), // Validates optional body and all three IDs
   loggedMiddleware,
   requireRole("etudiant"),
-  updateUserStory
+  updateUserStory,
 );
 
 // DELETE a user story by id
@@ -62,7 +62,7 @@ router.delete(
   validateRequest(userStoryParamsSchema), // Validates all three IDs
   loggedMiddleware,
   requireRole("etudiant"),
-  deleteUserStory
+  deleteUserStory,
 );
 
 export { router };

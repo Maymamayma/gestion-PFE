@@ -27,18 +27,6 @@ export const createUserStorySchema = z.object({
         ctx.addIssue({ code: "invalid_date", message: "Invalid start date." });
         return z.NEVER;
       }
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const dateOnly = new Date(date);
-      dateOnly.setHours(0, 0, 0, 0);
-      if (dateOnly.getTime() < today.getTime()) {
-        ctx.addIssue({
-          code: "expired_date",
-          message: "Start date cannot be in the past (expired).",
-        });
-        return z.NEVER;
-      }
-
       return date;
     }),
 
@@ -48,18 +36,6 @@ export const createUserStorySchema = z.object({
         ctx.addIssue({ code: "invalid_date", message: "Invalid end date." });
         return z.NEVER;
       }
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const dateOnly = new Date(date);
-      dateOnly.setHours(0, 0, 0, 0);
-      if (dateOnly.getTime() < today.getTime()) {
-        ctx.addIssue({
-          code: "expired_date",
-          message: "End date cannot be in the past (expired).",
-        });
-        return z.NEVER;
-      }
-      console.log("End date validated:", date);
       return date;
     }),
   }),
