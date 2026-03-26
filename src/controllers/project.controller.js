@@ -64,6 +64,7 @@ export const createProject = async (req, res) => {
     } = req.body;
 
     // Company Supervisor (optional)
+    let companySupervisorId = null;
     if (company_supervisor_email) {
       const companySupervisor = await User.findOne({
         email: company_supervisor_email,
@@ -74,6 +75,7 @@ export const createProject = async (req, res) => {
             "Invalid company_supervisor_email. User does not exist or is not a company supervisor.",
         });
       }
+      companySupervisorId = companySupervisor._id;
     }
 
     // University Supervisor (optional)
@@ -123,17 +125,6 @@ export const createProject = async (req, res) => {
       }
     }
 
-    // Company Supervisor
-    const companySupervisor = await User.findOne({
-      email: company_supervisor_email,
-    });
-    if (!companySupervisor || companySupervisor.role !== "encad_entreprise") {
-      return res.status(400).json({
-        error:
-          "Invalid company_supervisor_email. User does not exist or is not a company supervisor.",
-      });
-    }
-
     // University Supervisor
     const universitySupervisor = await User.findOne({
       email: university_supervisor_email,
@@ -154,8 +145,12 @@ export const createProject = async (req, res) => {
       start_date,
       end_date,
       students,
-      company_supervisor_email,
-      university_supervisor_email,
+      ...(companySupervisorId && {
+        company_supervisor_id: companySupervisorId,
+      }),
+      ...(universitySupervisor && {
+        university_supervisor_id: universitySupervisor._id,
+      }),
     });
 
     const returnedProject = await project.save();

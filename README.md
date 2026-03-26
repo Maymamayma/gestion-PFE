@@ -60,17 +60,17 @@ Client Request
 
 ## Tech Stack
 
-| Layer           | Technology                                                  |
-| --------------- | ----------------------------------------------------------- |
-| Runtime         | Node.js (ES Modules)                                        |
-| Framework       | Express 5.1                                                 |
-| Database        | MongoDB via Mongoose 9                                      |
-| Authentication  | JWT (`jsonwebtoken` 9.x) + `bcrypt`/`bcryptjs`              |
-| Validation      | Zod 4                                                       |
-| File Upload     | Multer 2 (PDF only)                                         |
-| API Docs        | Swagger UI (`swagger-jsdoc` + `swagger-ui-express`)          |
-| Utilities       | `uuid`, `validator`, `glob`, `dotenv`, `cors`                |
-| Dev Tooling     | Nodemon 3                                                   |
+| Layer          | Technology                                          |
+| -------------- | --------------------------------------------------- |
+| Runtime        | Node.js (ES Modules)                                |
+| Framework      | Express 5.1                                         |
+| Database       | MongoDB via Mongoose 9                              |
+| Authentication | JWT (`jsonwebtoken` 9.x) + `bcrypt`/`bcryptjs`      |
+| Validation     | Zod 4                                               |
+| File Upload    | Multer 2 (PDF only)                                 |
+| API Docs       | Swagger UI (`swagger-jsdoc` + `swagger-ui-express`) |
+| Utilities      | `uuid`, `validator`, `glob`, `dotenv`, `cors`       |
+| Dev Tooling    | Nodemon 3                                           |
 
 ---
 
@@ -189,11 +189,11 @@ MONGO_URL=mongodb://localhost:27017/gestion-pfe
 JWT_SECRET=your_jwt_secret_key
 ```
 
-| Variable     | Required | Default | Description                        |
-| ------------ | -------- | ------- | ---------------------------------- |
-| `PORT`       | No       | `5000`  | HTTP server port                   |
-| `MONGO_URL`  | **Yes**  | —       | MongoDB connection string          |
-| `JWT_SECRET` | **Yes**  | —       | Secret key for signing JWT tokens  |
+| Variable     | Required | Default | Description                       |
+| ------------ | -------- | ------- | --------------------------------- |
+| `PORT`       | No       | `5000`  | HTTP server port                  |
+| `MONGO_URL`  | **Yes**  | —       | MongoDB connection string         |
+| `JWT_SECRET` | **Yes**  | —       | Secret key for signing JWT tokens |
 
 ---
 
@@ -202,6 +202,7 @@ JWT_SECRET=your_jwt_secret_key
 **Base URL:** `http://localhost:5000/api`
 
 All protected endpoints require a JWT token in the `Authorization` header:
+
 ```
 Authorization: Bearer <token>
 ```
@@ -216,6 +217,7 @@ Authorization: Bearer <token>
 | POST   | `/auth/login`    | Login → returns JWT | No            |
 
 **Register — request body:**
+
 ```json
 {
   "email": "user@example.com",
@@ -224,33 +226,38 @@ Authorization: Bearer <token>
   "role": "etudiant"
 }
 ```
+
 Roles: `etudiant`, `encad_universitaire`, `encad_entreprise`
 
 **Login — response:**
+
 ```json
 {
   "token": "eyJhbGci...",
   "user": { "id": "...", "email": "...", "name": "...", "role": "etudiant" }
 }
 ```
+
 JWT payload: `{ userId, role }` — expires in **2 hours**.
 
 ---
 
 ### Projects
 
-| Method | Endpoint                         | Description                           | Roles           |
-| ------ | -------------------------------- | ------------------------------------- | --------------- |
-| POST   | `/projects`                      | Create project                        | etudiant        |
-| GET    | `/projects`                      | List projects (role-filtered)         | All authed      |
-| GET    | `/projects/:projectId`           | Get single project                    | All authed      |
-| PUT    | `/projects/:projectId`           | Update project                        | etudiant        |
-| DELETE | `/projects/:projectId`           | Delete project                        | etudiant        |
-| GET    | `/projects/:projectId/dashboard` | Aggregated project dashboard          | All authed      |
+| Method | Endpoint                         | Description                   | Roles      |
+| ------ | -------------------------------- | ----------------------------- | ---------- |
+| POST   | `/projects`                      | Create project                | etudiant   |
+| GET    | `/projects`                      | List projects (role-filtered) | All authed |
+| GET    | `/projects/:projectId`           | Get single project            | All authed |
+| PUT    | `/projects/:projectId`           | Update project                | etudiant   |
+| DELETE | `/projects/:projectId`           | Delete project                | etudiant   |
+| GET    | `/projects/:projectId/dashboard` | Aggregated project dashboard  | All authed |
 
 **Business rules:**
+
 - Max **2 students** per project (validated by role).
 - `end_date` must be ≥ today.
+- `company_supervisor_email` is **optional** when creating a project.
 - Students see only their own projects; supervisors see assigned projects.
 
 **Dashboard** returns: sprint list, task statistics (by status), progress %, pending validations, last 5 meetings, last 5 reports, and a sorted timeline (journal).
@@ -259,14 +266,14 @@ JWT payload: `{ userId, role }` — expires in **2 hours**.
 
 ### Sprints
 
-| Method | Endpoint                           | Description           | Roles      |
-| ------ | ---------------------------------- | --------------------- | ---------- |
-| POST   | `/projects/:projectId/sprints`     | Create sprint         | etudiant   |
-| GET    | `/projects/:projectId/sprints`     | List project sprints  | All authed |
-| GET    | `/sprints/:sprintId`               | Get sprint by ID      | etudiant   |
-| PUT    | `/sprints/:sprintId`               | Update sprint         | etudiant   |
-| DELETE | `/sprints/:sprintId`               | Delete sprint         | etudiant   |
-| GET    | `/sprints/:sprintId/dashboard`     | Sprint dashboard      | All authed |
+| Method | Endpoint                       | Description          | Roles      |
+| ------ | ------------------------------ | -------------------- | ---------- |
+| POST   | `/projects/:projectId/sprints` | Create sprint        | etudiant   |
+| GET    | `/projects/:projectId/sprints` | List project sprints | All authed |
+| GET    | `/sprints/:sprintId`           | Get sprint by ID     | etudiant   |
+| PUT    | `/sprints/:sprintId`           | Update sprint        | etudiant   |
+| DELETE | `/sprints/:sprintId`           | Delete sprint        | etudiant   |
+| GET    | `/sprints/:sprintId/dashboard` | Sprint dashboard     | All authed |
 
 - **Statuses:** `planned` → `active` → `completed`
 - Sprint `number` is unique per project (compound index on `project_id + number`).
@@ -276,13 +283,13 @@ JWT payload: `{ userId, role }` — expires in **2 hours**.
 
 ### User Stories
 
-| Method | Endpoint                                                                      | Description       |
-| ------ | ----------------------------------------------------------------------------- | ----------------- |
-| POST   | `/user-stories/projects/:projectId/sprints/:sprintId/userStories`             | Create            |
-| GET    | `/user-stories/projects/:projectId/sprints/:sprintId/userStories`             | List by sprint    |
-| GET    | `/user-stories/projects/:projectId/sprints/:sprintId/userStories/:id`         | Get by ID         |
-| PUT    | `/user-stories/projects/:projectId/sprints/:sprintId/userStories/:id`         | Update            |
-| DELETE | `/user-stories/projects/:projectId/sprints/:sprintId/userStories/:id`         | Delete            |
+| Method | Endpoint                                                              | Description    |
+| ------ | --------------------------------------------------------------------- | -------------- |
+| POST   | `/user-stories/projects/:projectId/sprints/:sprintId/userStories`     | Create         |
+| GET    | `/user-stories/projects/:projectId/sprints/:sprintId/userStories`     | List by sprint |
+| GET    | `/user-stories/projects/:projectId/sprints/:sprintId/userStories/:id` | Get by ID      |
+| PUT    | `/user-stories/projects/:projectId/sprints/:sprintId/userStories/:id` | Update         |
+| DELETE | `/user-stories/projects/:projectId/sprints/:sprintId/userStories/:id` | Delete         |
 
 User story dates are validated against the parent sprint's date range.
 
@@ -290,15 +297,15 @@ User story dates are validated against the parent sprint's date range.
 
 ### Tasks
 
-| Method | Endpoint                                                                           | Description              |
-| ------ | ---------------------------------------------------------------------------------- | ------------------------ |
-| POST   | `/tasks/projects/:projectId/sprints/:sprintId/userStories/:userStoryId/tasks`      | Create task              |
-| GET    | `/tasks/projects/:projectId/tasks`                                                 | List tasks (filterable)  |
-| GET    | `/tasks/:taskId`                                                                   | Get task by ID           |
-| PUT    | `/tasks/:taskId`                                                                   | Update task              |
-| DELETE | `/tasks/:taskId`                                                                   | Delete task              |
-| PUT    | `/tasks/:taskId/status`                                                            | Change task status       |
-| GET    | `/tasks/:taskId/history`                                                           | Status change audit log  |
+| Method | Endpoint                                                                      | Description             |
+| ------ | ----------------------------------------------------------------------------- | ----------------------- |
+| POST   | `/tasks/projects/:projectId/sprints/:sprintId/userStories/:userStoryId/tasks` | Create task             |
+| GET    | `/tasks/projects/:projectId/tasks`                                            | List tasks (filterable) |
+| GET    | `/tasks/:taskId`                                                              | Get task by ID          |
+| PUT    | `/tasks/:taskId`                                                              | Update task             |
+| DELETE | `/tasks/:taskId`                                                              | Delete task             |
+| PUT    | `/tasks/:taskId/status`                                                       | Change task status      |
+| GET    | `/tasks/:taskId/history`                                                      | Status change audit log |
 
 - **Statuses:** `ToDo`, `InProgress`, `Standby`, `Done`
 - **Priorities:** `Low`, `Medium`, `High`
@@ -331,11 +338,11 @@ User story dates are validated against the parent sprint's date range.
 
 ### Validations
 
-| Method | Endpoint                                        | Description                   | Roles                                   |
-| ------ | ----------------------------------------------- | ----------------------------- | --------------------------------------- |
-| POST   | `/validations/tasks/:taskId/validate`           | Validate a task               | encad_entreprise, encad_universitaire   |
-| GET    | `/validations/tasks/:taskId/validations`        | List validations for a task   | All authed                              |
-| GET    | `/validations/reunions/:meetingId/validations`  | List validations for a meeting | All authed                             |
+| Method | Endpoint                                       | Description                    | Roles                                 |
+| ------ | ---------------------------------------------- | ------------------------------ | ------------------------------------- |
+| POST   | `/validations/tasks/:taskId/validate`          | Validate a task                | encad_entreprise, encad_universitaire |
+| GET    | `/validations/tasks/:taskId/validations`       | List validations for a task    | All authed                            |
+| GET    | `/validations/reunions/:meetingId/validations` | List validations for a meeting | All authed                            |
 
 - **Validation types:** `Tache` (task) and `ContenuReunion` (meeting content).
 - `meetingId` is optional — supports out-of-meeting validation.
@@ -347,9 +354,10 @@ User story dates are validated against the parent sprint's date range.
 
 | Method | Endpoint                                      | Description       | Roles    |
 | ------ | --------------------------------------------- | ----------------- | -------- |
-| POST   | `/reports/projects/:projectId/reports/upload`  | Upload report PDF | etudiant |
+| POST   | `/reports/projects/:projectId/reports/upload` | Upload report PDF | etudiant |
 
 **Upload format:** `multipart/form-data`
+
 - Field `file`: PDF file (required, only `application/pdf` accepted)
 - Field `date`: Report date
 - Field `version`: Version string (required)
@@ -361,10 +369,10 @@ Files are stored in `uploads/reports/` with unique names: `report-{timestamp}-{r
 
 ### Report History
 
-| Method | Endpoint                                                            | Description            |
-| ------ | ------------------------------------------------------------------- | ---------------------- |
-| GET    | `/report-histories/projects/:projectId/reports`                     | List all report versions |
-| GET    | `/report-histories/projects/:projectId/reports/:reportId/download`  | Download PDF file      |
+| Method | Endpoint                                                           | Description              |
+| ------ | ------------------------------------------------------------------ | ------------------------ |
+| GET    | `/report-histories/projects/:projectId/reports`                    | List all report versions |
+| GET    | `/report-histories/projects/:projectId/reports/:reportId/download` | Download PDF file        |
 
 Reports are returned sorted by version descending.
 
@@ -372,12 +380,13 @@ Reports are returned sorted by version descending.
 
 ### Generated Reports (HTML)
 
-| Method | Endpoint                                                          | Description                     |
-| ------ | ----------------------------------------------------------------- | ------------------------------- |
-| GET    | `/project-reports/projects/:projectId/report`                     | Full project HTML report        |
-| GET    | `/sprint-reports/projects/:projectId/sprints/:sprintId/report`    | Sprint-scoped HTML report       |
+| Method | Endpoint                                                       | Description               |
+| ------ | -------------------------------------------------------------- | ------------------------- |
+| GET    | `/project-reports/projects/:projectId/report`                  | Full project HTML report  |
+| GET    | `/sprint-reports/projects/:projectId/sprints/:sprintId/report` | Sprint-scoped HTML report |
 
 These endpoints return **styled HTML documents** containing:
+
 - Task statistics (total, done, in progress, standby, todo) with progress bars
 - Sprint summary tables with task counts and completion percentages
 - Complete task listing with color-coded status and priority badges
@@ -405,25 +414,25 @@ User
 
 ### Schema Summary
 
-| Model           | Collection        | Key Fields                                                                    |
-| --------------- | ----------------- | ----------------------------------------------------------------------------- |
-| **User**        | `users`           | `email` (unique), `password` (bcrypt), `name`, `role` (enum: 3 values)        |
-| **Project**     | `projects`        | `title`, `description`, `start_date`, `end_date`, `students[]` (max 2), supervisor refs |
-| **Sprint**      | `sprints`         | `project_id`, `number` (unique/project), `title`, `start_date`, `end_date`, `status` |
-| **UserStory**   | `userstories`     | `title`, `description`, `start_date`, `end_date`, `sprintId`, `projectId`     |
-| **Task**        | `tasks`           | `title`, `description`, `status`, `priority`, `userStoryId`, `sprintId`, `projectId`, `createdBy` |
-| **TaskHistory** | `taskhistories`   | `taskId`, `oldStatus`, `newStatus`, `changedBy`, `notes`, `changedAt`         |
-| **Meeting**     | `reunions`        | `projectId`, `datePlanification`, `ordreDuJour`, `compteRendu`, `statut`, `referenceType`/`referenceId` |
-| **Validation**  | `validations`     | `taskId`?, `reunionId`?, `estValide`, `commentaire`, `validatedBy`, `typeValidation` |
-| **Report**      | `reports`         | `projectId`, `date`, `fileName`, `filePath`, `version`, `notes`               |
+| Model           | Collection      | Key Fields                                                                                              |
+| --------------- | --------------- | ------------------------------------------------------------------------------------------------------- |
+| **User**        | `users`         | `email` (unique), `password` (bcrypt), `name`, `role` (enum: 3 values)                                  |
+| **Project**     | `projects`      | `title`, `description`, `start_date`, `end_date`, `students[]` (max 2), supervisor refs                 |
+| **Sprint**      | `sprints`       | `project_id`, `number` (unique/project), `title`, `start_date`, `end_date`, `status`                    |
+| **UserStory**   | `userstories`   | `title`, `description`, `start_date`, `end_date`, `sprintId`, `projectId`                               |
+| **Task**        | `tasks`         | `title`, `description`, `status`, `priority`, `userStoryId`, `sprintId`, `projectId`, `createdBy`       |
+| **TaskHistory** | `taskhistories` | `taskId`, `oldStatus`, `newStatus`, `changedBy`, `notes`, `changedAt`                                   |
+| **Meeting**     | `reunions`      | `projectId`, `datePlanification`, `ordreDuJour`, `compteRendu`, `statut`, `referenceType`/`referenceId` |
+| **Validation**  | `validations`   | `taskId`?, `reunionId`?, `estValide`, `commentaire`, `validatedBy`, `typeValidation`                    |
+| **Report**      | `reports`       | `projectId`, `date`, `fileName`, `filePath`, `version`, `notes`                                         |
 
 ### User Roles
 
-| Role                   | Description                                                    |
-| ---------------------- | -------------------------------------------------------------- |
-| `etudiant`             | Student — creates/manages projects, sprints, tasks, reports    |
-| `encad_universitaire`  | University supervisor — validates tasks and meeting content     |
-| `encad_entreprise`     | Company supervisor — validates tasks                           |
+| Role                  | Description                                                 |
+| --------------------- | ----------------------------------------------------------- |
+| `etudiant`            | Student — creates/manages projects, sprints, tasks, reports |
+| `encad_universitaire` | University supervisor — validates tasks and meeting content |
+| `encad_entreprise`    | Company supervisor — validates tasks                        |
 
 ---
 
@@ -441,6 +450,7 @@ Request → cors() → express.json() → Route Match
 ```
 
 ### Authentication (`middleware/auth.js`)
+
 1. Extracts Bearer token from `Authorization` header.
 2. Verifies JWT signature with `JWT_SECRET`.
 3. Loads user from DB (excludes password).
@@ -448,32 +458,36 @@ Request → cors() → express.json() → Route Match
 5. Returns **401** on missing/invalid token or user not found.
 
 ### Role Authorization (`middleware/roles.js`)
+
 - Factory: `requireRole("etudiant", "encad_universitaire")`
 - Checks `req.user.role` ∈ allowed roles.
 - Returns **403** if denied.
 
 ### Request Validation (`middleware/validate.js`)
+
 - `validate(schema)` — validates combined body + params + query.
 - `validateRequest({ params, body, query })` — validates each section with separate schemas.
 - Returns **400** with structured Zod errors: `{ field, message, value, code }`.
 
 ### File Upload (`middleware/uploadReport.js`)
+
 - **Engine:** Multer disk storage.
 - **Destination:** `uploads/reports/`
 - **Filename pattern:** `report-{Date.now()}-{random}.{ext}`
 - **Filter:** Only `application/pdf` accepted.
 
 ### Error Handler (`middleware/errorHandler.js`)
+
 Handles all uncaught errors at the Express level:
 
-| Error Type              | HTTP Status | Description                        |
-| ----------------------- | ----------- | ---------------------------------- |
-| Mongoose ValidationError | 400        | Schema validation failure           |
-| Mongoose CastError       | 400        | Invalid ObjectId format             |
-| MongoDB 11000            | 400        | Duplicate key violation             |
-| JsonWebTokenError        | 401        | Invalid token                       |
-| TokenExpiredError        | 401        | Expired token                       |
-| Other                    | 500        | Internal server error               |
+| Error Type               | HTTP Status | Description               |
+| ------------------------ | ----------- | ------------------------- |
+| Mongoose ValidationError | 400         | Schema validation failure |
+| Mongoose CastError       | 400         | Invalid ObjectId format   |
+| MongoDB 11000            | 400         | Duplicate key violation   |
+| JsonWebTokenError        | 401         | Invalid token             |
+| TokenExpiredError        | 401         | Expired token             |
+| Other                    | 500         | Internal server error     |
 
 Stack traces are included in responses when `NODE_ENV !== 'production'`.
 
@@ -483,16 +497,17 @@ Stack traces are included in responses when `NODE_ENV !== 'production'`.
 
 All input validation uses **Zod** schemas in `src/validators/`:
 
-| Validator               | Validates                                                              |
-| ----------------------- | ---------------------------------------------------------------------- |
-| `meeting.validator`     | Create (future date, 10–2000 char agenda), update, complete (20–5000 char notes) |
-| `task.validator`        | Create (title 3–255, desc 10+, priority enum, ObjectId params), update, list filters |
-| `taskStatus.validator`  | Status enum + optional notes (max 500 chars)                            |
-| `userStory.validator`   | Create/update + custom middleware to verify dates fall within sprint range |
-| `validation.validator`  | `isValid` boolean, optional comment (max 1000), optional meetingId      |
-| `report.validator`      | ProjectId param, upload body (date, version, optional notes)            |
+| Validator              | Validates                                                                            |
+| ---------------------- | ------------------------------------------------------------------------------------ |
+| `meeting.validator`    | Create (future date, 10–2000 char agenda), update, complete (20–5000 char notes)     |
+| `task.validator`       | Create (title 3–255, desc 10+, priority enum, ObjectId params), update, list filters |
+| `taskStatus.validator` | Status enum + optional notes (max 500 chars)                                         |
+| `userStory.validator`  | Create/update + custom middleware to verify dates fall within sprint range           |
+| `validation.validator` | `isValid` boolean, optional comment (max 1000), optional meetingId                   |
+| `report.validator`     | ProjectId param, upload body (date, version, optional notes)                         |
 
 Key validation patterns:
+
 - **ObjectId format** checks on all resource identifiers
 - **String length** constraints with min/max
 - **Date parsing** with future-date enforcement where applicable
@@ -506,18 +521,18 @@ Key validation patterns:
 
 | Action                              | etudiant | encad_universitaire | encad_entreprise |
 | ----------------------------------- | :------: | :-----------------: | :--------------: |
-| Register / Login                    | ✅       | ✅                  | ✅               |
-| Create / Edit / Delete projects     | ✅       | ❌                  | ❌               |
-| Create / Edit / Delete sprints      | ✅       | ❌                  | ❌               |
-| Create / Edit / Delete tasks        | ✅       | ❌                  | ❌               |
-| Create / Edit / Delete user stories | ✅       | ❌                  | ❌               |
-| Upload reports                      | ✅       | ❌                  | ❌               |
-| Create / Manage meetings            | ✅       | ❌                  | ❌               |
-| Validate tasks                      | ❌       | ✅                  | ✅               |
-| Validate meeting content            | ❌       | ✅                  | ✅               |
-| View projects (own scope)           | ✅       | ✅                  | ✅               |
-| View dashboards & reports           | ✅       | ✅                  | ✅               |
-| Download reports                    | ✅       | ✅                  | ✅               |
+| Register / Login                    |    ✅    |         ✅          |        ✅        |
+| Create / Edit / Delete projects     |    ✅    |         ❌          |        ❌        |
+| Create / Edit / Delete sprints      |    ✅    |         ❌          |        ❌        |
+| Create / Edit / Delete tasks        |    ✅    |         ❌          |        ❌        |
+| Create / Edit / Delete user stories |    ✅    |         ❌          |        ❌        |
+| Upload reports                      |    ✅    |         ❌          |        ❌        |
+| Create / Manage meetings            |    ✅    |         ❌          |        ❌        |
+| Validate tasks                      |    ❌    |         ✅          |        ✅        |
+| Validate meeting content            |    ❌    |         ✅          |        ✅        |
+| View projects (own scope)           |    ✅    |         ✅          |        ✅        |
+| View dashboards & reports           |    ✅    |         ✅          |        ✅        |
+| Download reports                    |    ✅    |         ✅          |        ✅        |
 
 ---
 
