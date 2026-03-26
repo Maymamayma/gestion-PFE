@@ -33,8 +33,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/api/project-reports", projectReportRouter);
-app.use("/api/reports", reportRouter);
-app.use("/api/report-histories", reportHistoryRouter);
+// app.use("/api/reports", reportRouter);
+// app.use("/api/report-histories", reportHistoryRouter);
 app.use("/api/sprint-reports", sprintReportRouter);
 app.use("/api/tasks", taskRouter);
 app.use("/api/user-stories", userStoryRouter);

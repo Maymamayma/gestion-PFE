@@ -19,6 +19,10 @@ import {
   getProjectSprints,
 } from "../controllers/sprint.controller.js";
 
+import upload from "../middleware/uploadReport.js";
+import { uploadReportVersion } from "../controllers/report.controller.js";
+import { listHistory, downloadReport } from "../controllers/reportHistory.controller.js";
+
 const router = express.Router();
 router.get(
   "/:projectId/dashboard",
@@ -94,5 +98,28 @@ router.post(
 
 // List all sprints of a project
 router.get("/:projectId/sprints", loggedMiddleware, getProjectSprints);
+
+// --- new report routes ---
+router.post(
+  "/:projectId/reports/upload",
+  loggedMiddleware,
+  requireRole("etudiant"),
+  upload.single("pdf"),
+  uploadReportVersion
+);
+
+router.get(
+  "/:projectId/reports",
+  loggedMiddleware,
+  requireRole("etudiant", "encad_universitaire"),
+  listHistory
+);
+
+router.get(
+  "/:projectId/reports/:reportId/download",
+  loggedMiddleware,
+  requireRole("etudiant", "encad_universitaire"),
+  downloadReport
+);
 
 export default router;
