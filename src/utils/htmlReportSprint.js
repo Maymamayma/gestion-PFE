@@ -6,10 +6,10 @@ export const generateSprintReportHTML = (sprint, tasks, history) => {
 
   return `
       <!DOCTYPE html>
-      <html lang="fr">
+      <html lang="en">
         <head>
           <meta charset="UTF-8">
-          <title>Rapport Sprint ${sprint.number || sprint._id}</title>
+          <title>Sprint Report ${sprint.number || sprint._id}</title>
           <style>
             body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
             .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
@@ -35,32 +35,32 @@ export const generateSprintReportHTML = (sprint, tasks, history) => {
         </head>
         <body>
           <div class="container">
-            <h1>📊 Rapport Sprint ${sprint.number || "N/A"}</h1>
-            <p><strong>Nom :</strong> ${sprint.title || "Sprint"}</p>
-            <p><strong>Période :</strong> ${
+            <h1>Sprint Report ${sprint.number || "N/A"}</h1>
+            <p><strong>Name:</strong> ${sprint.title || "Sprint"}</p>
+            <p><strong>Period:</strong> ${
               sprint.start_date
-                ? new Date(sprint.start_date).toLocaleDateString("fr-FR")
+                ? new Date(sprint.start_date).toLocaleDateString("en-US")
                 : "N/A"
             } → ${
-    sprint.end_date
-      ? new Date(sprint.end_date).toLocaleDateString("fr-FR")
-      : "N/A"
-  }</p>
+              sprint.end_date
+                ? new Date(sprint.end_date).toLocaleDateString("en-US")
+                : "N/A"
+            }</p>
 
-            <h2>📈 Avancement du Sprint</h2>
+            <h2>Sprint Progress</h2>
             <div class="progress-container">
               <div class="progress-bar" style="width: ${progressPercent}%">${progressPercent}%</div>
             </div>
-            <p><strong>Tâches terminées :</strong> ${doneTasks} / ${totalTasks}</p>
+            <p><strong>Completed Tasks:</strong> ${doneTasks} / ${totalTasks}</p>
 
-            <h2>✅ Tâches du Sprint</h2>
+            <h2>Sprint Tasks</h2>
             <table>
               <thead>
                 <tr>
-                  <th>Titre</th>
+                  <th>Title</th>
                   <th>Description</th>
-                  <th>Statut</th>
-                  <th>Priorité</th>
+                  <th>Status</th>
+                  <th>Priority</th>
                 </tr>
               </thead>
               <tbody>
@@ -73,29 +73,29 @@ export const generateSprintReportHTML = (sprint, tasks, history) => {
                     <td><strong>${t.title}</strong></td>
                     <td>${t.description}</td>
                     <td><span class="status status-${t.status.toLowerCase()}">${
-                            t.status
-                          }</span></td>
+                      t.status
+                    }</span></td>
                     <td><span class="priority priority-${t.priority.toLowerCase()}">${
-                            t.priority
-                          }</span></td>
+                      t.priority
+                    }</span></td>
                   </tr>
-                `
+                `,
                         )
                         .join("")
-                    : '<tr><td colspan="4">Aucune tâche</td></tr>'
+                    : '<tr><td colspan="4">No tasks</td></tr>'
                 }
               </tbody>
             </table>
 
-            <h2>📜 Historique des Changements</h2>
+            <h2>Change History</h2>
             <table>
               <thead>
                 <tr>
-                  <th>Tâche</th>
-                  <th>Ancien Statut</th>
-                  <th>Nouveau Statut</th>
+                  <th>Task</th>
+                  <th>Previous Status</th>
+                  <th>New Status</th>
                   <th>Date</th>
-                  <th>Modifié par</th>
+                  <th>Changed By</th>
                 </tr>
               </thead>
               <tbody>
@@ -107,26 +107,26 @@ export const generateSprintReportHTML = (sprint, tasks, history) => {
                   <tr>
                     <td>${h.taskId?.title || "N/A"}</td>
                     <td><span class="status status-${h.oldStatus.toLowerCase()}">${
-                            h.oldStatus
-                          }</span></td>
+                      h.oldStatus
+                    }</span></td>
                     <td><span class="status status-${h.newStatus.toLowerCase()}">${
-                            h.newStatus
-                          }</span></td>
-                    <td>${new Date(h.changedAt).toLocaleString("fr-FR")}</td>
+                      h.newStatus
+                    }</span></td>
+                    <td>${new Date(h.changedAt).toLocaleString("en-US")}</td>
                     <td>${
-                      h.changedBy?.user_name || h.changedBy?.email || "Inconnu"
+                      h.changedBy?.user_name || h.changedBy?.email || "Unknown"
                     }</td>
                   </tr>
-                `
+                `,
                         )
                         .join("")
-                    : '<tr><td colspan="5">Aucun historique</td></tr>'
+                    : '<tr><td colspan="5">No history</td></tr>'
                 }
               </tbody>
             </table>
 
             <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #888;">
-              <p>Rapport généré le ${new Date().toLocaleString("fr-FR")}</p>
+              <p>Report generated on ${new Date().toLocaleString("en-US")}</p>
             </footer>
           </div>
         </body>
